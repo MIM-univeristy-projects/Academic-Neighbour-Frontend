@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LandingPage } from './landing-page';
+import { MainBody } from './main-body/main-body';
+import { Header } from './header/header';
+import { Footer } from './footer/footer';
 
 describe('LandingPage', () => {
   let component: LandingPage;
@@ -10,7 +13,7 @@ describe('LandingPage', () => {
     await TestBed.configureTestingModule({
       imports: [LandingPage]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(LandingPage);
     component = fixture.componentInstance;
