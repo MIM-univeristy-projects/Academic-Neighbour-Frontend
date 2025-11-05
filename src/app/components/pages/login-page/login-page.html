@@ -1,1 +1,92 @@
-<p>login-page works!</p>
+<div class="flex items-center justify-center min-h-screen p-4 bg-gray-900">
+
+  <div class="w-full max-w-md bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+
+    <div class="flex">
+      <button
+        (click)="activeTab = 'login'"
+        [ngClass]="{
+          'bg-blue-600 text-white': activeTab === 'login',
+          'bg-gray-800 text-gray-400 hover:bg-gray-700': activeTab !== 'login'
+        }"
+        class="flex-1 py-4 px-6 font-semibold transition-colors duration-200 focus:outline-none">
+        Zaloguj
+      </button>
+
+      <button
+        (click)="activeTab = 'register'"
+        [ngClass]="{
+          'bg-blue-600 text-white': activeTab === 'register',
+          'bg-gray-800 text-gray-400 hover:bg-gray-700': activeTab !== 'register'
+        }"
+        class="flex-1 py-4 px-6 font-semibold transition-colors duration-200 focus:outline-none">
+        Zarejestruj
+      </button>
+    </div>
+
+    <div class="p-8">
+
+      <div *ngIf="activeTab === 'login'">
+        
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email address</mat-label>
+            <input matInput 
+                   formControlName="email" 
+                   type="email" 
+                   placeholder="email@example.com">
+            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+              Email jest wymagany
+            </mat-error>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+              Wprowadź poprawny email
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full mt-4">
+            <mat-label>Password</mat-label>
+            <input matInput 
+                   formControlName="password" 
+                   [type]="hidePassword ? 'password' : 'text'">
+            <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button" [attr.aria-label]="'Ukryj/pokaż hasło'">
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+              Hasło jest wymagane
+            </mat-error>
+          </mat-form-field>
+
+          <div class="flex items-center justify-between mt-4">
+            <mat-checkbox formControlName="rememberMe" color="primary">
+              Remember me
+            </mat-checkbox>
+            <a href="#" class="text-sm text-blue-400 hover:underline">
+              Forgot password?
+            </a>
+          </div>
+
+          <button mat-flat-button 
+                  color="primary" 
+                  type="submit"
+                  [disabled]="loginForm.invalid"
+                  class="w-full py-3 mt-8 text-base font-bold">
+            Sign in
+          </button>
+
+          <div class="text-center mt-6">
+            <a href="#" class="text-sm text-gray-400 hover:text-white">
+              New around here? Sign up
+            </a>
+          </div>
+
+        </form>
+      </div>
+
+      <div *ngIf="activeTab === 'register'" class="text-center text-gray-400">
+        <p class="py-16">Formularz rejestracji pojawi się tutaj.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
