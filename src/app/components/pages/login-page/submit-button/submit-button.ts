@@ -7,16 +7,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './submit-button.css',
 })
 export class SubmitButton {
-// @Input() pozwala rodzicowi (login-page) przekazać dane DO tego komponentu
-  
-  /** Jaki tekst ma być na przycisku? */
   @Input() text: string = 'Submit';
-  
-  /** Czy przycisk ma być nieaktywny? */
   @Input() disabled: boolean = false;
-
-  // @Output() pozwala temu komponentowi emitować zdarzenia DO rodzica
-  
-  /** Emituje zdarzenie, gdy przycisk zostanie kliknięty */
   @Output() buttonClick = new EventEmitter<void>();
 }

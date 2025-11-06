@@ -1,12 +1,12 @@
-import { Component, OnInit, inject, signal } from '@angular/core'; // Dodano OnInit i inject
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   AbstractControl,
-  ReactiveFormsModule, // Import dla Reactive Forms
+  ReactiveFormsModule, 
   FormBuilder, 
   FormGroup, 
   Validators 
-} from '@angular/forms'; // Importy dla FormBuilder, FormGroup i Walidatorów
+} from '@angular/forms'; 
 
 import { AuthToggle } from './auth-toggle/auth-toggle';
 import { SubmitButton } from './submit-button/submit-button';
@@ -17,7 +17,7 @@ import { ValidationErrors } from './validation-errors/validation-errors';
   standalone: true,
   imports: [
     CommonModule, 
-    ReactiveFormsModule, // Dodajemy ReactiveFormsModule do importów
+    ReactiveFormsModule, 
     AuthToggle,
     SubmitButton,
     ValidationErrors
@@ -25,80 +25,66 @@ import { ValidationErrors } from './validation-errors/validation-errors';
   templateUrl: './login-page.html',
   styleUrl: './login-page.css'
 })
-export class LoginPage implements OnInit { // Implementujemy OnInit
+export class LoginPage implements OnInit { 
 
-  // Wstrzyknięcie FormBuilder'a (nowoczesny sposób)
+
   private fb = inject(FormBuilder);
 
-  // Sygnał do zarządzania aktywnym formularzem
+
   activeForm = signal<'login' | 'register'>('login');
 
-  // Definicje formularzy
+
   loginForm!: FormGroup;
   registerForm!: FormGroup;
 
   ngOnInit(): void {
-    // 1. Inicjalizacja formularza logowania
+
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rememberMe: [false]
     });
 
-    // 2. Inicjalizacja formularza rejestracji
+
     this.registerForm = this.fb.group({
-      // Zgodnie z mockupem, email i hasło są na górze
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]], // Dodałem minLength dla bezpieczeństwa
-      
-      // Reszta pól adresowych
+      password: ['', [Validators.required, Validators.minLength(8)]], 
       address: ['', [Validators.required]],
-      address2: [''], // Pole opcjonalne
+      address2: [''], 
       city: ['', [Validators.required]],
-      state: ['', [Validators.required]], // "Choose..." sugeruje, że to pole jest wymagane
-      zip: ['', [Validators.required, Validators.pattern('^\\d{2}-\\d{3}$')]], // Podstawowy wzorzec US ZIP, można zmienić
+      state: ['', [Validators.required]], 
+      zip: ['', [Validators.required, Validators.pattern('^\\d{2}-\\d{3}$')]], 
       
       checkMeOut: [false]
     });
   }
 
-  /**
-   * Ustawia aktywny formularz.
-   */
+
   setForm(form: 'login' | 'register') {
     this.activeForm.set(form);
   }
 
-  /**
-   * Obsługa wysłania formularza logowania.
-   */
+
   onLoginSubmit(): void {
     if (this.loginForm.valid) {
       console.log('Logowanie:', this.loginForm.value);
-      // Tutaj w przyszłości będzie wywołanie serwisu API
     } else {
       console.warn('Formularz logowania jest niepoprawny.');
-      this.loginForm.markAllAsTouched(); // Pokaż błędy walidacji
+      this.loginForm.markAllAsTouched(); 
     }
   }
 
-  /**
-   * Obsługa wysłania formularza rejestracji.
-   */
   onRegisterSubmit(): void {
     if (this.registerForm.valid) {
       console.log('Rejestracja:', this.registerForm.value);
-      // Tutaj w przyszłości będzie wywołanie serwisu API
     } else {
       console.warn('Formularz rejestracji jest niepoprawny.');
-      this.registerForm.markAllAsTouched(); // Pokaż błędy walidacji
+      this.registerForm.markAllAsTouched();
     }
   }
 
   get l_email(): AbstractControl | null { return this.loginForm.get('email'); }
   get l_password(): AbstractControl | null { return this.loginForm.get('password'); }
-
-  // Gettery dla formularza rejestracji
   get r_email(): AbstractControl | null { return this.registerForm.get('email'); }
   get r_password(): AbstractControl | null { return this.registerForm.get('password'); }
   get r_address(): AbstractControl | null { return this.registerForm.get('address'); }

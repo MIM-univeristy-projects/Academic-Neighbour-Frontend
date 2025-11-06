@@ -9,9 +9,6 @@ import { AbstractControl } from '@angular/forms';
   styleUrl: './validation-errors.css',
 })
 export class ValidationErrors {
-  /** Kontrolka formularza do obserwowania */
   @Input({ required: true }) control: AbstractControl | null = null;
-
-  /** Polska, przyjazna nazwa kontrolki (np. "Hasło", "Email") */
   @Input() controlName: string = 'To pole';
 }

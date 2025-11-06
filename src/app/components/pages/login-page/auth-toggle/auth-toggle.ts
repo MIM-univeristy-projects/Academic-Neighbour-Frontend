@@ -8,9 +8,6 @@ import { CommonModule } from '@angular/common';
   styleUrl: './auth-toggle.css',
 })
 export class AuthToggle {
-/** Jaki formularz jest aktualnie aktywny? */
   @Input({ required: true }) activeForm!: 'login' | 'register';
-
-  /** Emituje zdarzenie, gdy użytkownik chce zmienić formularz */
   @Output() formChange = new EventEmitter<'login' | 'register'>();
 }
