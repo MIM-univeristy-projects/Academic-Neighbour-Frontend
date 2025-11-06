@@ -1,59 +1,109 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core'; // Dodano OnInit i inject
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { 
+  AbstractControl,
+  ReactiveFormsModule, // Import dla Reactive Forms
+  FormBuilder, 
+  FormGroup, 
+  Validators 
+} from '@angular/forms'; // Importy dla FormBuilder, FormGroup i Walidatorów
 
-// Importy Angular Material
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
+import { AuthToggle } from './auth-toggle/auth-toggle';
+import { SubmitButton } from './submit-button/submit-button';
+import { ValidationErrors } from './validation-errors/validation-errors';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatIconModule
+    CommonModule, 
+    ReactiveFormsModule, // Dodajemy ReactiveFormsModule do importów
+    AuthToggle,
+    SubmitButton,
+    ValidationErrors
   ],
   templateUrl: './login-page.html',
-  styleUrls: ['./login-page.css'] // Zmienione z .scss na .css
+  styleUrl: './login-page.css'
 })
-export class LoginPage {
+export class LoginPage implements OnInit { // Implementujemy OnInit
 
-  // Zmienna do przełączania zakładek
-  activeTab: 'login' | 'register' = 'login';
-
-  // Wstrzykiwanie FormBuildera
+  // Wstrzyknięcie FormBuilder'a (nowoczesny sposób)
   private fb = inject(FormBuilder);
 
-  // Zmienna do pokazywania/ukrywania hasła
-  hidePassword = true;
+  // Sygnał do zarządzania aktywnym formularzem
+  activeForm = signal<'login' | 'register'>('login');
 
-  // Definicja formularza reaktywnego
-  loginForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
-    rememberMe: [false]
-  });
+  // Definicje formularzy
+  loginForm!: FormGroup;
+  registerForm!: FormGroup;
 
-  // Metoda do wysyłania formularza
-  onSubmit(): void {
+  ngOnInit(): void {
+    // 1. Inicjalizacja formularza logowania
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+      rememberMe: [false]
+    });
+
+    // 2. Inicjalizacja formularza rejestracji
+    this.registerForm = this.fb.group({
+      // Zgodnie z mockupem, email i hasło są na górze
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]], // Dodałem minLength dla bezpieczeństwa
+      
+      // Reszta pól adresowych
+      address: ['', [Validators.required]],
+      address2: [''], // Pole opcjonalne
+      city: ['', [Validators.required]],
+      state: ['', [Validators.required]], // "Choose..." sugeruje, że to pole jest wymagane
+      zip: ['', [Validators.required, Validators.pattern('^\\d{2}-\\d{3}$')]], // Podstawowy wzorzec US ZIP, można zmienić
+      
+      checkMeOut: [false]
+    });
+  }
+
+  /**
+   * Ustawia aktywny formularz.
+   */
+  setForm(form: 'login' | 'register') {
+    this.activeForm.set(form);
+  }
+
+  /**
+   * Obsługa wysłania formularza logowania.
+   */
+  onLoginSubmit(): void {
     if (this.loginForm.valid) {
-      console.log('Formularz wysłany:', this.loginForm.value);
-      // Tutaj logika logowania
+      console.log('Logowanie:', this.loginForm.value);
+      // Tutaj w przyszłości będzie wywołanie serwisu API
     } else {
-      console.log('Formularz jest niepoprawny');
+      console.warn('Formularz logowania jest niepoprawny.');
+      this.loginForm.markAllAsTouched(); // Pokaż błędy walidacji
     }
   }
 
-  // Metoda do przełączania widoczności hasła
-  togglePasswordVisibility(): void {
-    this.hidePassword = !this.hidePassword;
+  /**
+   * Obsługa wysłania formularza rejestracji.
+   */
+  onRegisterSubmit(): void {
+    if (this.registerForm.valid) {
+      console.log('Rejestracja:', this.registerForm.value);
+      // Tutaj w przyszłości będzie wywołanie serwisu API
+    } else {
+      console.warn('Formularz rejestracji jest niepoprawny.');
+      this.registerForm.markAllAsTouched(); // Pokaż błędy walidacji
+    }
   }
+
+  get l_email(): AbstractControl | null { return this.loginForm.get('email'); }
+  get l_password(): AbstractControl | null { return this.loginForm.get('password'); }
+
+  // Gettery dla formularza rejestracji
+  get r_email(): AbstractControl | null { return this.registerForm.get('email'); }
+  get r_password(): AbstractControl | null { return this.registerForm.get('password'); }
+  get r_address(): AbstractControl | null { return this.registerForm.get('address'); }
+  get r_city(): AbstractControl | null { return this.registerForm.get('city'); }
+  get r_state(): AbstractControl | null { return this.registerForm.get('state'); }
+  get r_zip(): AbstractControl | null { return this.registerForm.get('zip'); }
+
 }

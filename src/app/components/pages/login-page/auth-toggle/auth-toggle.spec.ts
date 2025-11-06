@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SingInButton } from './sing-in-button';
+import { AuthToggle } from './auth-toggle';
 
-describe('SingInButton', () => {
-  let component: SingInButton;
-  let fixture: ComponentFixture<SingInButton>;
+describe('AuthToggle', () => {
+  let component: AuthToggle;
+  let fixture: ComponentFixture<AuthToggle>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SingInButton]
+      imports: [AuthToggle]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SingInButton);
+    fixture = TestBed.createComponent(AuthToggle);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

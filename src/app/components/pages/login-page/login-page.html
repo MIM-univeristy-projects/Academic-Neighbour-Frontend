@@ -1,92 +1,99 @@
-<div class="flex items-center justify-center min-h-screen p-4 bg-gray-900">
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden">
+    
+    <app-auth-toggle 
+      [activeForm]="activeForm()" 
+      (formChange)="setForm($event)" />
 
-  <div class="w-full max-w-md bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-
-    <div class="flex">
-      <button
-        (click)="activeTab = 'login'"
-        [ngClass]="{
-          'bg-blue-600 text-white': activeTab === 'login',
-          'bg-gray-800 text-gray-400 hover:bg-gray-700': activeTab !== 'login'
-        }"
-        class="flex-1 py-4 px-6 font-semibold transition-colors duration-200 focus:outline-none">
-        Zaloguj
-      </button>
-
-      <button
-        (click)="activeTab = 'register'"
-        [ngClass]="{
-          'bg-blue-600 text-white': activeTab === 'register',
-          'bg-gray-800 text-gray-400 hover:bg-gray-700': activeTab !== 'register'
-        }"
-        class="flex-1 py-4 px-6 font-semibold transition-colors duration-200 focus:outline-none">
-        Zarejestruj
-      </button>
-    </div>
-
-    <div class="p-8">
-
-      <div *ngIf="activeTab === 'login'">
-        
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="p-6">
+      
+      @if (activeForm() === 'login') {
+        <form [formGroup]="loginForm">
           
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Email address</mat-label>
-            <input matInput 
-                   formControlName="email" 
-                   type="email" 
-                   placeholder="email@example.com">
-            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-              Email jest wymagany
-            </mat-error>
-            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-              Wprowadź poprawny email
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full mt-4">
-            <mat-label>Password</mat-label>
-            <input matInput 
-                   formControlName="password" 
-                   [type]="hidePassword ? 'password' : 'text'">
-            <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button" [attr.aria-label]="'Ukryj/pokaż hasło'">
-              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-            </button>
-            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-              Hasło jest wymagane
-            </mat-error>
-          </mat-form-field>
-
-          <div class="flex items-center justify-between mt-4">
-            <mat-checkbox formControlName="rememberMe" color="primary">
-              Remember me
-            </mat-checkbox>
-            <a href="#" class="text-sm text-blue-400 hover:underline">
-              Forgot password?
-            </a>
+          <div class="mb-4">
+            <label for="login-email" class="block mb-2 text-sm font-medium text-gray-900">Adres email</label>
+            <input type="email" id="login-email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="email@example.com">
+            <app-validation-errors [control]="l_email" controlName="Adres email" />
           </div>
-
-          <button mat-flat-button 
-                  color="primary" 
-                  type="submit"
-                  [disabled]="loginForm.invalid"
-                  class="w-full py-3 mt-8 text-base font-bold">
-            Sign in
-          </button>
-
-          <div class="text-center mt-6">
-            <a href="#" class="text-sm text-gray-400 hover:text-white">
-              New around here? Sign up
-            </a>
+          
+          <div class="mb-4">
+            <label for="login-password" class="block mb-2 text-sm font-medium text-gray-900">Hasło</label>
+            <input type="password" id="login-password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="••••••••">
+            <app-validation-errors [control]="l_password" controlName="Hasło" />
           </div>
-
+          
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+              <input id="remember" type="checkbox" formControlName="rememberMe" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+              <label for="remember" class="ml-2 text-sm font-medium text-gray-900">Zapamiętaj mnie</label>
+            </div>
+            <a href="#" class="text-sm text-blue-600 hover:underline">Nie pamiętasz hasła?</a>
+          </div>
+          <app-submit-button text="Zaloguj się" [disabled]="loginForm.invalid" (buttonClick)="onLoginSubmit()" />
+          <p class="mt-4 text-sm text-center text-gray-700">
+            Nowy w serwisie? 
+            <a (click)="setForm('register')" class="font-medium text-blue-600 hover:underline cursor-pointer">Zarejestruj się</a>
+          </p>
         </form>
-      </div>
+      } 
+      
+      @else {
+        <form [formGroup]="registerForm">
+          
+          <div class="mb-4">
+            <label for="reg-email" class="block mb-2 text-sm font-medium text-gray-900">Adres email</label>
+            <input type="email" id="reg-email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="email@example.com">
+            <app-validation-errors [control]="r_email" controlName="Adres email" />
+          </div>
+          
+          <div class="mb-4">
+            <label for="reg-password" class="block mb-2 text-sm font-medium text-gray-900">Hasło</label>
+            <input type="password" id="reg-password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Minimum 8 znaków">
+            <app-validation-errors [control]="r_password" controlName="Hasło" />
+          </div>
 
-      <div *ngIf="activeTab === 'register'" class="text-center text-gray-400">
-        <p class="py-16">Formularz rejestracji pojawi się tutaj.</p>
-      </div>
+          <div class="mb-4">
+            <label for="address" class="block mb-2 text-sm font-medium text-gray-900">Adres</label>
+            <input type="text" id="address" formControlName="address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Np. ul. Główna 123">
+            <app-validation-errors [control]="r_address" controlName="Adres" />
+          </div>
 
+          <div class="mb-4">
+            <label for="address2" class="block mb-2 text-sm font-medium text-gray-900">Adres 2 (opcjonalnie)</label>
+            <input type="text" id="address2" formControlName="address2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Nr mieszkania, lokalu itp.">
+          </div>
+          
+          <div class="mb-4">
+            <label for="city" class="block mb-2 text-sm font-medium text-gray-900">Miasto</label>
+            <input type="text" id="city" formControlName="city" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <app-validation-errors [control]="r_city" controlName="Miasto" />
+          </div>
+            
+          <div class="mb-4">
+            <label for="state" class="block mb-2 text-sm font-medium text-gray-900">Województwo</label>
+            <input type="text" id="state" formControlName="state" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Np. Mazowieckie">
+            <app-validation-errors [control]="r_state" controlName="Województwo" />
+          </div>
+            
+          <div class="mb-4">
+            <label for="zip" class="block mb-2 text-sm font-medium text-gray-900">Kod pocztowy</label>
+            <input type="text" id="zip" formControlName="zip" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Np. 00-001">
+            <app-validation-errors [control]="r_zip" controlName="Kod pocztowy" />
+          </div>
+
+          <div class="flex items-center mb-4">
+            <input id="checkMeOut" type="checkbox" formControlName="checkMeOut" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+            <label for="checkMeOut" class="ml-2 text-sm font-medium text-gray-900">Zgadzam się na... (marketing)</label>
+          </div>
+
+          <app-submit-button text="Zarejestruj się" [disabled]="registerForm.invalid" (buttonClick)="onRegisterSubmit()" />
+           
+          <p class="mt-4 text-sm text-center text-gray-700">
+            Masz już konto? 
+            <a (click)="setForm('login')" class="font-medium text-blue-600 hover:underline cursor-pointer">Zaloguj się</a>
+          </p>
+        </form>
+      }
     </div>
   </div>
 </div>

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FormBody } from './form-body';
+import { SubmitButton } from './submit-button';
 
-describe('FormBody', () => {
-  let component: FormBody;
-  let fixture: ComponentFixture<FormBody>;
+describe('SubmitButton', () => {
+  let component: SubmitButton;
+  let fixture: ComponentFixture<SubmitButton>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormBody]
+      imports: [SubmitButton]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FormBody);
+    fixture = TestBed.createComponent(SubmitButton);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
