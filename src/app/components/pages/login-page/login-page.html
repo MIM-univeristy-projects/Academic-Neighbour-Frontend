@@ -1,4 +1,4 @@
-<div class="flex items-center justify-center min-h-screen bg-gray-100">
+<div class="flex items-center justify-center min-h-screen bg-gray-200">
   <div class="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden">
     
     <app-auth-toggle 
@@ -12,19 +12,19 @@
           
           <div class="mb-4">
             <label for="login-email" class="block mb-2 text-sm font-medium text-gray-900">Adres email</label>
-            <input type="email" id="login-email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="email@example.com">
+            <input type="email" id="login-email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400" placeholder="email@example.com">
             <app-validation-errors [control]="l_email" controlName="Adres email" />
           </div>
           
           <div class="mb-4">
             <label for="login-password" class="block mb-2 text-sm font-medium text-gray-900">Hasło</label>
-            <input type="password" id="login-password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="••••••••">
+            <input type="password" id="login-password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400" placeholder="••••••••">
             <app-validation-errors [control]="l_password" controlName="Hasło" />
           </div>
           
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center">
-              <input id="remember" type="checkbox" formControlName="rememberMe" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+              <input id="remember" type="checkbox" formControlName="rememberMe" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 placeholder-gray-400">
               <label for="remember" class="ml-2 text-sm font-medium text-gray-900">Zapamiętaj mnie</label>
             </div>
             <a href="#" class="text-sm text-blue-600 hover:underline">Nie pamiętasz hasła?</a>
@@ -42,47 +42,47 @@
           
           <div class="mb-4">
             <label for="reg-email" class="block mb-2 text-sm font-medium text-gray-900">Adres email</label>
-            <input type="email" id="reg-email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="email@example.com">
+            <input type="email" id="reg-email" formControlName="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400" placeholder="email@example.com">
             <app-validation-errors [control]="r_email" controlName="Adres email" />
           </div>
           
           <div class="mb-4">
             <label for="reg-password" class="block mb-2 text-sm font-medium text-gray-900">Hasło</label>
-            <input type="password" id="reg-password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Minimum 8 znaków">
+            <input type="password" id="reg-password" formControlName="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400" placeholder="Minimum 8 znaków">
             <app-validation-errors [control]="r_password" controlName="Hasło" />
           </div>
 
           <div class="mb-4">
             <label for="address" class="block mb-2 text-sm font-medium text-gray-900">Adres</label>
-            <input type="text" id="address" formControlName="address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Np. ul. Główna 123">
+            <input type="text" id="address" formControlName="address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400" placeholder="Np. ul. Główna 123">
             <app-validation-errors [control]="r_address" controlName="Adres" />
           </div>
 
           <div class="mb-4">
             <label for="address2" class="block mb-2 text-sm font-medium text-gray-900">Adres 2 (opcjonalnie)</label>
-            <input type="text" id="address2" formControlName="address2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Nr mieszkania, lokalu itp.">
+            <input type="text" id="address2" formControlName="address2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400" placeholder="Nr mieszkania, lokalu itp.">
           </div>
           
           <div class="mb-4">
             <label for="city" class="block mb-2 text-sm font-medium text-gray-900">Miasto</label>
-            <input type="text" id="city" formControlName="city" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            <input type="text" id="city" formControlName="city" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400">
             <app-validation-errors [control]="r_city" controlName="Miasto" />
           </div>
             
           <div class="mb-4">
             <label for="state" class="block mb-2 text-sm font-medium text-gray-900">Województwo</label>
-            <input type="text" id="state" formControlName="state" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Np. Mazowieckie">
+            <input type="text" id="state" formControlName="state" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400" placeholder="Np. Mazowieckie">
             <app-validation-errors [control]="r_state" controlName="Województwo" />
           </div>
             
           <div class="mb-4">
             <label for="zip" class="block mb-2 text-sm font-medium text-gray-900">Kod pocztowy</label>
-            <input type="text" id="zip" formControlName="zip" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Np. 00-001">
+            <input type="text" id="zip" formControlName="zip" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400" placeholder="Np. 00-001">
             <app-validation-errors [control]="r_zip" controlName="Kod pocztowy" />
           </div>
 
           <div class="flex items-center mb-4">
-            <input id="checkMeOut" type="checkbox" formControlName="checkMeOut" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+            <input id="checkMeOut" type="checkbox" formControlName="checkMeOut" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 placeholder-gray-400">
             <label for="checkMeOut" class="ml-2 text-sm font-medium text-gray-900">Zgadzam się na... (marketing)</label>
           </div>
 
