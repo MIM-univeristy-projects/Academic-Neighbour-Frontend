@@ -1,0 +1,33 @@
+<form [formGroup]="loginForm">
+  <div class="mb-4">
+    <label for="login-email" class="block mb-2 text-sm font-medium text-gray-900">Adres email</label>
+    <input type="email" id="login-email" formControlName="email"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+      placeholder="email@example.com">
+    <app-validation-errors [control]="loginForm.get('email')" controlName="Adres email" />
+  </div>
+
+  <div class="mb-4">
+    <label for="login-password" class="block mb-2 text-sm font-medium text-gray-900">Hasło</label>
+    <input type="password" id="login-password" formControlName="password"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+      placeholder="••••••••">
+    <app-validation-errors [control]="loginForm.get('password')" controlName="Hasło" />
+  </div>
+
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center">
+      <input id="remember" type="checkbox" formControlName="rememberMe"
+        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 placeholder-gray-400">
+      <label for="remember" class="ml-2 text-sm font-medium text-gray-900">Zapamiętaj mnie</label>
+    </div>
+    <a href="#" class="text-sm text-blue-600 hover:underline">Nie pamiętasz hasła?</a>
+  </div>
+
+  <app-submit-button text="Zaloguj się" [disabled]="loginForm.invalid" (buttonClick)="onSubmit()" />
+
+  <p class="mt-4 text-sm text-center text-gray-700">
+    Nowy w serwisie?
+    <a (click)="onSwitchToRegister()" class="font-medium text-blue-600 hover:underline cursor-pointer">Zarejestruj się</a>
+  </p>
+</form>

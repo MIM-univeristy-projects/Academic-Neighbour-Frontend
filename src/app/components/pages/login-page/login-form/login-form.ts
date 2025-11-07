@@ -1,0 +1,25 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { SubmitButton } from '../submit-button/submit-button';
+import { ValidationErrors } from '../validation-errors/validation-errors';
+
+@Component({
+    selector: 'app-login-form',
+    standalone: true,
+    imports: [ReactiveFormsModule, SubmitButton, ValidationErrors],
+    templateUrl: './login-form.html',
+    styleUrl: './login-form.css'
+})
+export class LoginForm {
+    @Input({ required: true }) loginForm!: FormGroup;
+    @Output() submitLogin = new EventEmitter<void>();
+    @Output() switchToRegister = new EventEmitter<void>();
+
+    onSubmit(): void {
+        this.submitLogin.emit();
+    }
+
+    onSwitchToRegister(): void {
+        this.switchToRegister.emit();
+    }
+}
