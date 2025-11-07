@@ -6,11 +6,11 @@
 
     <div class="p-6">
       @if (activeForm() === 'login') {
-      <app-login-form [loginForm]="loginForm" (submitLogin)="onLoginSubmit()"
+      <app-login-form [loginForm]="loginForm" [apiError]="apiError()" (submitLogin)="onLoginSubmit()"
         (switchToRegister)="setForm('register')" />
       }
       @else {
-      <app-register-form [registerForm]="registerForm" (submitRegister)="onRegisterSubmit()"
+      <app-register-form [registerForm]="registerForm" [apiError]="apiError()" (submitRegister)="onRegisterSubmit()"
         (switchToLogin)="setForm('login')" />
       }
     </div>
