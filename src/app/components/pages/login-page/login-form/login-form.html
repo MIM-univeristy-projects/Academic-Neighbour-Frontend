@@ -26,7 +26,8 @@
 
     <p class="mt-4 text-sm text-center text-gray-700">
         Nowy w serwisie?
-        <a (click)="onSwitchToRegister()" class="font-medium text-blue-600 hover:underline cursor-pointer">Zarejestruj
+        <a (click)="onSwitchToRegister()" (keyup.enter)="onSwitchToRegister()" tabindex="0" role="button"
+            class="font-medium text-blue-600 hover:underline cursor-pointer">Zarejestruj
             się</a>
     </p>
 </form>

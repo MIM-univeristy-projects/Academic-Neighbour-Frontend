@@ -10,5 +10,5 @@ import { AbstractControl } from '@angular/forms';
 })
 export class ValidationErrors {
   @Input({ required: true }) control: AbstractControl | null = null;
-  @Input() controlName: string = 'To pole';
+  @Input() controlName = 'To pole';
 }

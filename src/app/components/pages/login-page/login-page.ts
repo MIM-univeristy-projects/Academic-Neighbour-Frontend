@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import {
   NonNullableFormBuilder,
@@ -12,6 +13,16 @@ import { Header } from "../landing-page/header/header";
 import { AuthToggle } from './auth-toggle/auth-toggle';
 import { LoginForm } from './login-form/login-form';
 import { RegisterForm } from './register-form/register-form';
+
+interface ValidationError {
+  loc?: (string | number)[];
+  msg: string;
+  type?: string;
+}
+
+interface ErrorDetail {
+  detail?: string | ValidationError[];
+}
 
 @Component({
   selector: 'app-login-page',
@@ -74,7 +85,7 @@ export class LoginPage {
     }
   }
 
-  private handleLoginError(error: any): void {
+  private handleLoginError(error: HttpErrorResponse): void {
     console.error('Błąd logowania:', error);
 
     switch (error.status) {
@@ -91,19 +102,18 @@ export class LoginPage {
       case 504:
         this.apiError.set('Serwer jest obecnie niedostępny. Spróbuj ponownie za chwilę.');
         break;
+      case 408:
+        this.apiError.set('Przekroczono czas oczekiwania na odpowiedź serwera. Spróbuj ponownie.');
+        break;
       default:
-        if (error.name === 'TimeoutError') {
-          this.apiError.set('Przekroczono czas oczekiwania na odpowiedź serwera. Spróbuj ponownie.');
-        } else {
-          this.apiError.set('Wystąpił błąd podczas logowania. Spróbuj ponownie.');
-        }
+        this.apiError.set('Wystąpił błąd podczas logowania. Spróbuj ponownie.');
     }
   }
 
-  private handle422Error(error: any): void {
-    const detail = error.error?.detail;
+  private handle422Error(error: HttpErrorResponse): void {
+    const detail = (error.error as ErrorDetail)?.detail;
     if (Array.isArray(detail)) {
-      const errorMessages = detail.map((err: any) => {
+      const errorMessages = detail.map((err: ValidationError) => {
         const field = err.loc?.[1] || 'Pole';
         return `${field}: ${err.msg}`;
       }).join(', ');
@@ -135,7 +145,7 @@ export class LoginPage {
     }
   }
 
-  private handleRegisterError(error: any): void {
+  private handleRegisterError(error: HttpErrorResponse): void {
     console.error('Błąd rejestracji:', error);
 
     switch (error.status) {
@@ -155,12 +165,11 @@ export class LoginPage {
       case 504:
         this.apiError.set('Serwer jest obecnie niedostępny. Spróbuj ponownie za chwilę.');
         break;
+      case 408:
+        this.apiError.set('Przekroczono czas oczekiwania na odpowiedź serwera. Spróbuj ponownie.');
+        break;
       default:
-        if (error.name === 'TimeoutError') {
-          this.apiError.set('Przekroczono czas oczekiwania na odpowiedź serwera. Spróbuj ponownie.');
-        } else {
-          this.apiError.set('Wystąpił błąd podczas rejestracji. Spróbuj ponownie.');
-        }
+        this.apiError.set('Wystąpił błąd podczas rejestracji. Spróbuj ponownie.');
     }
   }
 }

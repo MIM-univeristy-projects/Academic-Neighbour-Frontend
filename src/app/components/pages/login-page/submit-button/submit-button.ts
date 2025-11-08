@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './submit-button.css',
 })
 export class SubmitButton {
-  @Input() text: string = 'Submit';
-  @Input() disabled: boolean = false;
+  @Input() text = 'Submit';
+  @Input() disabled = false;
   @Output() buttonClick = new EventEmitter<void>();
 }

@@ -28,5 +28,5 @@ export interface AuthResponse {
     user: User;
 }
 
-export interface RegisterResponse extends AuthResponse { }
-export interface LoginResponse extends AuthResponse { }
+export type RegisterResponse = AuthResponse
+export type LoginResponse = AuthResponse
