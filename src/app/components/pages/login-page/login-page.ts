@@ -55,7 +55,8 @@ export class LoginPage implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      lastname: ['', [Validators.required]]
+      first_name: ['', [Validators.required]],
+      last_name: ['', [Validators.required]]
     });
   }
 
@@ -100,7 +101,11 @@ export class LoginPage implements OnInit {
           } else if (error.status === 401) {
             this.apiError.set('Nieprawidłowy email lub hasło.');
           } else if (error.status === 0) {
-            this.apiError.set('Nie można połączyć się z serwerem. Sprawdź połączenie internetowe.');
+            this.apiError.set('Nie można połączyć się z serwerem. Sprawdź połączenie internetowe lub spróbuj ponownie później.');
+          } else if (error.name === 'TimeoutError') {
+            this.apiError.set('Przekroczono czas oczekiwania na odpowiedź serwera. Spróbuj ponownie.');
+          } else if (error.status === 504 || error.status === 503) {
+            this.apiError.set('Serwer jest obecnie niedostępny. Spróbuj ponownie za chwilę.');
           } else {
             this.apiError.set('Wystąpił błąd podczas logowania. Spróbuj ponownie.');
           }
@@ -120,7 +125,8 @@ export class LoginPage implements OnInit {
         email: this.registerForm.value.email,
         username: this.registerForm.value.username,
         password: this.registerForm.value.password,
-        lastname: this.registerForm.value.lastname
+        first_name: this.registerForm.value.first_name,
+        last_name: this.registerForm.value.last_name
       };
 
       this.authService.register(registerData).subscribe({
@@ -150,7 +156,11 @@ export class LoginPage implements OnInit {
           } else if (error.status === 409) {
             this.apiError.set('Użytkownik z tym adresem email już istnieje.');
           } else if (error.status === 0) {
-            this.apiError.set('Nie można połączyć się z serwerem. Sprawdź połączenie internetowe.');
+            this.apiError.set('Nie można połączyć się z serwerem. Sprawdź połączenie internetowe lub spróbuj ponownie później.');
+          } else if (error.name === 'TimeoutError') {
+            this.apiError.set('Przekroczono czas oczekiwania na odpowiedź serwera. Spróbuj ponownie.');
+          } else if (error.status === 504 || error.status === 503) {
+            this.apiError.set('Serwer jest obecnie niedostępny. Spróbuj ponownie za chwilę.');
           } else {
             this.apiError.set('Wystąpił błąd podczas rejestracji. Spróbuj ponownie.');
           }
