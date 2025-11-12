@@ -1,0 +1,70 @@
+<header class="fixed top-4 left-1/2 transform -translate-x-1/2 w-[90%] max-w-7xl z-50
+         bg-linear-to-r from-white/90 via-white/85 to-white/90
+         backdrop-blur-lg border border-white/50 rounded-2xl shadow-xl shadow-black/10">
+    <div class="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-4 lg:py-5">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <span class="text-2xl sm:text-3xl">🍻</span>
+            <button [routerLink]="['/home']"
+                class="text-lg sm:text-2xl font-bold bg-linear-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent tracking-tight cursor-pointer hover:opacity-80 transition-opacity">
+                Somsiad z akademika
+            </button>
+        </div>
+
+        <!-- Navigation - Desktop -->
+        <nav class="hidden md:flex items-center gap-2">
+            <button mat-button [routerLink]="['/feed']" routerLinkActive="active-link"
+                class="text-gray-700 hover:bg-amber-50">
+                <mat-icon class="mr-2">home</mat-icon>
+                Tablica
+            </button>
+            <button mat-button class="text-gray-700 hover:bg-amber-50">
+                <mat-icon class="mr-2">people</mat-icon>
+                Społeczność
+            </button>
+            <button mat-button class="text-gray-700 hover:bg-amber-50">
+                <mat-icon class="mr-2">notifications</mat-icon>
+                Powiadomienia
+            </button>
+        </nav>
+
+        <!-- User Menu -->
+        <div>
+            <button mat-button [matMenuTriggerFor]="menu"
+                class="flex items-center gap-1 sm:gap-2 bg-linear-to-r from-amber-400 to-pink-500 text-white rounded-full px-3 sm:px-4 py-2 hover:from-amber-500 hover:to-pink-600 transition-all shadow-md">
+                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm">
+                    U
+                </div>
+                <span class="hidden sm:inline font-medium">Moje konto</span>
+                <mat-icon class="hidden sm:inline">arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+                <button mat-menu-item>
+                    <mat-icon>person</mat-icon>
+                    <span>Profil</span>
+                </button>
+                <button mat-menu-item>
+                    <mat-icon>settings</mat-icon>
+                    <span>Ustawienia</span>
+                </button>
+                <button mat-menu-item class="md:hidden" [routerLink]="['/feed']">
+                    <mat-icon>home</mat-icon>
+                    <span>Tablica</span>
+                </button>
+                <button mat-menu-item class="md:hidden">
+                    <mat-icon>people</mat-icon>
+                    <span>Społeczność</span>
+                </button>
+                <button mat-menu-item class="md:hidden">
+                    <mat-icon>notifications</mat-icon>
+                    <span>Powiadomienia</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="logout()">
+                    <mat-icon>logout</mat-icon>
+                    <span>Wyloguj się</span>
+                </button>
+            </mat-menu>
+        </div>
+    </div>
+</header>

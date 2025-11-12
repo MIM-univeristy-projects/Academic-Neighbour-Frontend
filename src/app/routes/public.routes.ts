@@ -2,7 +2,11 @@ import { Routes } from '@angular/router';
 import { guestGuard } from '../guards/guest.guard';
 
 export const publicRoutes: Routes = [
-    { title: 'Home', path: '', loadComponent: () => import('../components/pages/landing-page/landing-page').then(m => m.LandingPage) },
+    {
+        title: 'Home',
+        path: 'home',
+        loadComponent: () => import('../components/pages/landing-page/landing-page').then(m => m.LandingPage)
+    },
     {
         title: 'Login',
         path: 'login',

@@ -6,4 +6,9 @@ export const protectedRoutes: Routes = [
         path: 'feed',
         loadComponent: () => import('../components/pages/feed/feed').then(m => m.Feed)
     },
+    {
+        path: '',
+        redirectTo: 'feed',
+        pathMatch: 'full'
+    },
 ];

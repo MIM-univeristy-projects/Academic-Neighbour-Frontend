@@ -1,1 +1,46 @@
-<p>Tu będzie Feed użytkownika</p>
+<div class="min-h-screen bg-linear-to-b from-gray-50 to-gray-100">
+    <!-- Navigation Header -->
+    <app-feed-header></app-feed-header>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 pt-32 pb-8 sm:px-6 lg:px-8">
+        <!-- Page Title -->
+        <header class="mb-8 text-center sm:text-left animate-[fadeIn_0.6s_ease-out]">
+            <h1
+                class="text-5xl font-extrabold mb-3 bg-linear-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent">
+                Tablica
+            </h1>
+            <p class="text-lg text-gray-600 font-medium">
+                Dziel się swoimi myślami ze społecznością
+            </p>
+        </header>
+
+        <!-- Content -->
+        <div class="space-y-4">
+            <app-create-post-form (createPost)="onCreatePost($event)"></app-create-post-form>
+
+            @if (isLoading) {
+            <div class="flex flex-col items-center justify-center p-16 bg-white rounded-2xl shadow-md">
+                <div class="w-16 h-16 border-4 border-gray-200 border-t-amber-500 rounded-full animate-spin mb-4">
+                </div>
+                <p class="text-gray-600 font-medium">Ładowanie postów...</p>
+            </div>
+            } @else if (posts.length === 0) {
+            <div class="flex flex-col items-center justify-center p-16 bg-white rounded-2xl shadow-md">
+                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <mat-icon class="text-gray-400 text-5xl! w-12! h-12!">inbox</mat-icon>
+                </div>
+                <p class="text-xl font-semibold text-gray-700 mb-2">Brak postów do wyświetlenia</p>
+                <p class="text-sm text-gray-500">Bądź pierwszą osobą, która coś opublikuje!</p>
+            </div>
+            } @else {
+            <div class="space-y-4">
+                @for (post of posts; track post.id) {
+                <app-post [post]="post" (likePost)="onLikePost($event)" (commentPost)="onCommentPost($event)">
+                </app-post>
+                }
+            </div>
+            }
+        </div>
+    </div>
+</div>
