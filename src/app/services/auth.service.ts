@@ -105,10 +105,14 @@ export class AuthService {
 
     /**
      * Logout user and clear authentication state
+     * @param navigate - Whether to navigate after logout (default: true)
      */
-    logout(): void {
+    logout(navigate = true): void {
         this.clearAuthData();
-        this.router.navigate(['/']);
+
+        if (navigate) {
+            this.router.navigate(['/']);
+        }
     }
 
     /**
@@ -171,7 +175,7 @@ export class AuthService {
     /**
      * Parse JWT token payload
      */
-    private parseJwt(token: string): any {
+    private parseJwt(token: string): { exp?: number;[key: string]: unknown } {
         try {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -182,7 +186,7 @@ export class AuthService {
                     .join('')
             );
             return JSON.parse(jsonPayload);
-        } catch (error) {
+        } catch {
             throw new Error('Invalid token format');
         }
     }

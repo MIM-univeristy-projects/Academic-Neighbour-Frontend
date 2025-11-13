@@ -5,7 +5,7 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { LoginRequest, RegisterRequest } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
@@ -41,9 +41,12 @@ export class LoginPage {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly activeForm = signal<'login' | 'register'>('login');
   readonly apiError = signal<string | null>(null);
+
+  private returnUrl = '/feed';
 
   readonly loginForm = this.fb.group({
     username: ['', [Validators.required]],
@@ -57,6 +60,23 @@ export class LoginPage {
     first_name: ['', [Validators.required]],
     last_name: ['', [Validators.required]]
   });
+
+  constructor() {
+    // Check for query parameters
+    this.route.queryParams.subscribe(params => {
+      // Store return URL if provided
+      if (params['returnUrl']) {
+        this.returnUrl = params['returnUrl'];
+      }
+
+      // Show appropriate message based on query params
+      if (params['sessionExpired']) {
+        this.apiError.set('Twoja sesja wygasła. Zaloguj się ponownie.');
+      } else if (params['authRequired']) {
+        this.apiError.set('Musisz się zalogować, aby uzyskać dostęp do tej strony.');
+      }
+    });
+  }
 
 
   setForm(form: 'login' | 'register') {
@@ -75,7 +95,7 @@ export class LoginPage {
         next: (response) => {
           console.log('Logowanie udane:', response);
           this.apiError.set(null);
-          this.router.navigate(['/feed']);
+          this.router.navigate([this.returnUrl]);
         },
         error: (error) => this.handleLoginError(error)
       });
@@ -135,7 +155,7 @@ export class LoginPage {
         next: (response) => {
           console.log('Rejestracja udana:', response);
           this.apiError.set(null);
-          this.router.navigate(['/feed']);
+          this.router.navigate([this.returnUrl]);
         },
         error: (error) => this.handleRegisterError(error)
       });
