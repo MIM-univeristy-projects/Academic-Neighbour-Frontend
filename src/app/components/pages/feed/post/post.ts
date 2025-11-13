@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
+import { Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Post } from '../../../../models/post.model';
@@ -20,19 +20,26 @@ import { Post } from '../../../../models/post.model';
     styleUrl: './post.css',
 })
 export class PostComponent {
-    @Input({ required: true }) post!: Post;
-    @Output() likePost = new EventEmitter<number>();
-    @Output() commentPost = new EventEmitter<number>();
+    // Modern input() API
+    post = input.required<Post>();
+
+    // Modern output() API
+    likePost = output<number>();
+    commentPost = output<number>();
+
+    // Computed signals
+    readonly formattedDate = computed(() => this.getFormattedDate(this.post().created_at));
+    readonly authorInitial = computed(() => `U${this.post().author_id}`);
 
     onLike(): void {
-        this.likePost.emit(this.post.id);
+        this.likePost.emit(this.post().id);
     }
 
     onComment(): void {
-        this.commentPost.emit(this.post.id);
+        this.commentPost.emit(this.post().id);
     }
 
-    getFormattedDate(dateString: string): string {
+    private getFormattedDate(dateString: string): string {
         const now = new Date();
         const postDate = new Date(dateString);
         const diffInMs = now.getTime() - postDate.getTime();
@@ -51,9 +58,5 @@ export class PostComponent {
         } else {
             return postDate.toLocaleDateString('pl-PL');
         }
-    }
-
-    getAuthorInitial(): string {
-        return `U${this.post.author_id}`;
     }
 }

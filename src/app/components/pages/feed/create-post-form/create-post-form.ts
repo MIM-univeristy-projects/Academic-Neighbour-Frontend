@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, computed, inject, output, signal } from '@angular/core';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { CreatePostDto } from '../../../../models/post.model';
 
 @Component({
@@ -24,49 +24,48 @@ import { CreatePostDto } from '../../../../models/post.model';
     styleUrl: './create-post-form.css',
 })
 export class CreatePostFormComponent {
-    @Output() createPost = new EventEmitter<CreatePostDto>();
+    private fb = inject(NonNullableFormBuilder);
 
-    postForm: FormGroup;
-    isExpanded = false;
+    // Modern output() API
+    createPost = output<CreatePostDto>();
 
-    constructor(private fb: FormBuilder) {
-        this.postForm = this.fb.group({
-            text: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(5000)]],
-        });
-    }
+    // Signal-based state
+    readonly isExpanded = signal(false);
+
+    readonly postForm = this.fb.group({
+        text: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(5000)]],
+    });
+
+    // Computed signals
+    readonly characterCount = computed(() => {
+        const text = this.postForm.controls.text.value;
+        return text?.length || 0;
+    });
+
+    readonly characterCountColor = computed(() => {
+        const count = this.characterCount();
+        if (count > 4500) return 'text-red-500';
+        if (count > 4000) return 'text-orange-500';
+        return 'text-gray-500';
+    });
 
     onFocus(): void {
-        this.isExpanded = true;
+        this.isExpanded.set(true);
     }
 
     onCancel(): void {
-        this.isExpanded = false;
+        this.isExpanded.set(false);
         this.postForm.reset();
     }
 
     onSubmit(): void {
         if (this.postForm.valid) {
             const postData: CreatePostDto = {
-                text: this.postForm.value.text.trim(),
+                text: this.postForm.value.text!.trim(),
             };
             this.createPost.emit(postData);
             this.postForm.reset();
-            this.isExpanded = false;
+            this.isExpanded.set(false);
         }
-    }
-
-    get text() {
-        return this.postForm.get('text');
-    }
-
-    get characterCount(): number {
-        return this.text?.value?.length || 0;
-    }
-
-    get characterCountColor(): string {
-        const count = this.characterCount;
-        if (count > 4500) return 'text-red-500';
-        if (count > 4000) return 'text-orange-500';
-        return 'text-gray-500';
     }
 }

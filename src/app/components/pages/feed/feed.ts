@@ -1,66 +1,77 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Post, CreatePostDto } from '../../../models/post.model';
-import { PostComponent } from './post/post';
+import { CreatePostDto } from '../../../models/post.model';
+import { PostService } from '../../../services/post.service';
 import { CreatePostFormComponent } from './create-post-form/create-post-form';
 import { FeedHeaderComponent } from './feed-header/feed-header';
-import { PostService } from '../../../services/post.service';
+import { PostComponent } from './post/post';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, MatIconModule, PostComponent, CreatePostFormComponent, FeedHeaderComponent],
+  imports: [CommonModule, MatIconModule, MatButtonModule, PostComponent, CreatePostFormComponent, FeedHeaderComponent],
   templateUrl: './feed.html',
   styleUrl: './feed.css',
 })
-export class Feed implements OnInit {
-  posts: Post[] = [];
-  isLoading = false;
+export class Feed {
+  private postService = inject(PostService);
 
-  constructor(private postService: PostService) { }
+  // Signal-based state management
+  readonly isLoading = signal(false);
+  readonly errorMessage = signal<string | null>(null);
 
-  ngOnInit(): void {
+  // Use service's cached posts for reactive updates
+  readonly posts = this.postService.cachedPosts;
+
+  // Computed signals
+  readonly hasPosts = computed(() => this.posts().length > 0);
+  readonly isEmpty = computed(() => !this.isLoading() && !this.hasPosts());
+  readonly hasError = computed(() => !!this.errorMessage());
+
+  constructor() {
     this.loadPosts();
   }
 
   loadPosts(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
     this.postService.getPosts().subscribe({
-      next: (posts) => {
-        this.posts = posts;
-        this.isLoading = false;
+      next: () => {
+        this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error loading posts:', error);
-        this.isLoading = false;
+        this.errorMessage.set('Nie udało się załadować postów. Spróbuj ponownie.');
+        this.isLoading.set(false);
       },
     });
   }
 
   onCreatePost(postData: CreatePostDto): void {
     this.postService.createPost(postData).subscribe({
-      next: (newPost) => {
-        this.posts = [newPost, ...this.posts];
-        console.log('New post created:', newPost);
+      next: () => {
+        // Service automatically updates the cache
+        this.errorMessage.set(null);
       },
       error: (error) => {
         console.error('Error creating post:', error);
+        this.errorMessage.set('Nie udało się utworzyć posta. Spróbuj ponownie.');
       },
     });
   }
 
   onLikePost(postId: number): void {
     this.postService.likePost(postId).subscribe({
-      next: (likedPost) => {
-        const index = this.posts.findIndex((p) => p.id === postId);
-        if (index !== -1) {
-          this.posts[index] = likedPost;
-        }
-        console.log('Post liked:', postId);
+      next: () => {
+        // Service automatically updates the cache
+        this.errorMessage.set(null);
       },
       error: (error) => {
         console.error('Error liking post:', error);
+        this.errorMessage.set('Nie udało się polubić posta. Spróbuj ponownie.');
       },
     });
   }
@@ -68,5 +79,9 @@ export class Feed implements OnInit {
   onCommentPost(postId: number): void {
     // TODO: Implement comment functionality
     console.log('Comment on post:', postId);
+  }
+
+  retryLoad(): void {
+    this.loadPosts();
   }
 }

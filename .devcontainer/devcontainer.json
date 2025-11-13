@@ -14,7 +14,8 @@
                 "cweijan.vscode-database-client2",
                 "ecmel.vscode-html-css",
                 "pranaygp.vscode-css-peek",
-                "aar.xlf-editor"
+                "aar.xlf-editor",
+                "dbaeumer.vscode-eslint"
             ]
         }
     },

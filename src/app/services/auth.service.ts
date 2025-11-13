@@ -24,20 +24,15 @@ export class AuthService {
     private readonly TOKEN_KEY = 'access_token';
     private readonly USER_KEY = 'user_data';
 
-    // Signal-based reactive state
     private tokenSignal = signal<string | null>(null);
     private userSignal = signal<User | null>(null);
 
-    // Public computed signals
     readonly token = this.tokenSignal.asReadonly();
     readonly currentUser = this.userSignal.asReadonly();
     readonly isAuthenticated = computed(() => !!this.tokenSignal());
 
     constructor() {
-        // Initialize state from storage on service creation
         this.initializeAuthState();
-
-        // Optionally set up automatic token expiration check
         effect(() => {
             const token = this.tokenSignal();
             if (token && this.isTokenExpired(token)) {
