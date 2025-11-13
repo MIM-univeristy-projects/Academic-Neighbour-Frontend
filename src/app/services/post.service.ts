@@ -1,76 +1,87 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { Post, CreatePostDto } from '../models/post.model';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { CreatePostDto, Post, PostWithAuthor } from '../models/post.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PostService {
-    private mockPosts: Post[] = [
-        {
-            id: 1,
-            text: 'Witam sąsiadów! Właśnie dołączyłem do platformy Academic Neighbour. Cieszę się, że mogę być częścią tej wspaniałej społeczności! 🎉',
-            author_id: 1,
-            created_at: new Date(Date.now() - 3600000).toISOString(),
-        },
-        {
-            id: 2,
-            text: 'Czy ktoś ma notatki z wykładu z matematyki? Niestety przegapiłem ostatnie zajęcia. Z góry dziękuję za pomoc! 📚',
-            author_id: 2,
-            created_at: new Date(Date.now() - 7200000).toISOString(),
-        },
-        {
-            id: 3,
-            text: 'Organizuję sesję nauki w bibliotece w przyszły poniedziałek o 16:00. Kto chce dołączyć? 📖',
-            author_id: 3,
-            created_at: new Date(Date.now() - 86400000).toISOString(),
-        },
-    ];
+    private http = inject(HttpClient);
+    private authService = inject(AuthService);
 
-    constructor() { }
+    private apiUrl = environment.apiUrl;
 
-    // Get all posts
+    /**
+     * Get all posts
+     */
     getPosts(): Observable<Post[]> {
-        // TODO: Replace with actual HTTP call
-        // return this.http.get<Post[]>('/api/posts');
-        return of([...this.mockPosts]).pipe(delay(500));
+        return this.http.get<Post[]>(`${this.apiUrl}/posts/`).pipe(
+            catchError(error => {
+                console.error('Failed to fetch posts:', error);
+                return throwError(() => error);
+            })
+        );
     }
 
-    // Create a new post
+    /**
+     * Create a new post
+     */
     createPost(postData: CreatePostDto): Observable<Post> {
-        // TODO: Replace with actual HTTP call
-        // return this.http.post<Post>('/api/posts', postData);
-        const newPost: Post = {
-            id: Date.now(),
+        const currentUser = this.authService.currentUser();
+
+        if (!currentUser?.id) {
+            return throwError(() => new Error('User must be authenticated to create a post'));
+        }
+
+        const postPayload: Partial<Post> = {
             text: postData.text,
-            author_id: 1, // TODO: Get from auth service
-            created_at: new Date().toISOString(),
+            author_id: currentUser.id
         };
-        this.mockPosts = [newPost, ...this.mockPosts];
-        return of(newPost).pipe(delay(300));
+
+        return this.http.post<Post>(`${this.apiUrl}/posts/`, postPayload).pipe(
+            catchError(error => {
+                console.error('Failed to create post:', error);
+                return throwError(() => error);
+            })
+        );
     }
 
-    // Like a post
+    /**
+     * Like a post
+     */
     likePost(postId: number): Observable<Post> {
-        // TODO: Replace with actual HTTP call
-        // return this.http.post<Post>(`/api/posts/${postId}/like`, {});
-        const post = this.mockPosts.find((p) => p.id === postId);
-        return of(post!).pipe(delay(200));
+        return this.http.post<Post>(`${this.apiUrl}/posts/${postId}/like`, {}).pipe(
+            catchError(error => {
+                console.error('Failed to like post:', error);
+                return throwError(() => error);
+            })
+        );
     }
 
-    // Get a single post by ID
-    getPost(postId: number): Observable<Post | undefined> {
-        // TODO: Replace with actual HTTP call
-        // return this.http.get<Post>(`/api/posts/${postId}`);
-        const post = this.mockPosts.find((p) => p.id === postId);
-        return of(post).pipe(delay(300));
+    /**
+     * Get a single post by ID
+     */
+    getPost(postId: number): Observable<Post> {
+        return this.http.get<Post>(`${this.apiUrl}/posts/${postId}`).pipe(
+            catchError(error => {
+                console.error('Failed to fetch post:', error);
+                return throwError(() => error);
+            })
+        );
     }
 
-    // Delete a post
-    deletePost(postId: number): Observable<void> {
-        // TODO: Replace with actual HTTP call
-        // return this.http.delete<void>(`/api/posts/${postId}`);
-        this.mockPosts = this.mockPosts.filter((p) => p.id !== postId);
-        return of(void 0).pipe(delay(300));
+    /**
+     * Get a single post by ID with author information
+     */
+    getPostWithAuthor(postId: number): Observable<PostWithAuthor> {
+        return this.http.get<PostWithAuthor>(`${this.apiUrl}/posts/${postId}/with-author`).pipe(
+            catchError(error => {
+                console.error('Failed to fetch post with author:', error);
+                return throwError(() => error);
+            })
+        );
     }
 }

@@ -1,11 +1,10 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
-import { guestGuard } from './guards/guest.guard';
 import { protectedRoutes } from './routes/protected.routes';
 import { publicRoutes } from './routes/public.routes';
 
 export const routes: Routes = [
-    // Default root route - redirect to home (landing page)
+    // Default root route
     {
         path: '',
         redirectTo: 'home',
@@ -22,6 +21,6 @@ export const routes: Routes = [
         children: protectedRoutes
     },
 
-    // Wildcard - redirect to home
+    // Wildcard
     { path: '**', redirectTo: 'home', pathMatch: 'full' },
 ];
