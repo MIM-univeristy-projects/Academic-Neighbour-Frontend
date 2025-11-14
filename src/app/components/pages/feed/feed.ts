@@ -4,22 +4,25 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { CreatePostDto } from '../../../models/post.model';
+import { PostCreate } from '../../../models/post.model';
 import { AuthService } from '../../../services/auth.service';
+import { EventService } from '../../../services/event.service';
 import { PostService } from '../../../services/post.service';
 import { CreatePostFormComponent } from './create-post-form/create-post-form';
 import { FeedHeaderComponent } from './feed-header/feed-header';
+import { FeedTabsComponent } from './feed-tabs/feed-tabs';
 import { PostComponent } from './post/post';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, PostComponent, CreatePostFormComponent, FeedHeaderComponent],
+  imports: [CommonModule, MatIconModule, MatButtonModule, PostComponent, CreatePostFormComponent, FeedHeaderComponent, FeedTabsComponent],
   templateUrl: './feed.html',
   styleUrl: './feed.css',
 })
 export class Feed {
   private postService = inject(PostService);
+  private eventService = inject(EventService);
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -27,9 +30,11 @@ export class Feed {
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly isRedirecting = signal(false);
+  readonly activeTab = signal<'board' | 'events' | 'groups'>('board');
 
-  // Use service's cached posts for reactive updates
+  // Use service's cached posts and events for reactive updates
   readonly posts = this.postService.cachedPosts;
+  readonly events = this.eventService.cachedEvents;
 
   // Computed signals
   readonly hasPosts = computed(() => this.posts().length > 0);
@@ -38,6 +43,7 @@ export class Feed {
 
   constructor() {
     this.loadPosts();
+    this.loadEvents();
   }
 
   loadPosts(): void {
@@ -56,7 +62,7 @@ export class Feed {
     });
   }
 
-  onCreatePost(postData: CreatePostDto): void {
+  onCreatePost(postData: PostCreate): void {
     // Check authentication before creating post
     if (!this.authService.isAuthenticated()) {
       this.redirectToLogin('Musisz być zalogowany, aby utworzyć post.');
@@ -105,8 +111,33 @@ export class Feed {
     console.log('Comment on post:', postId);
   }
 
+  loadEvents(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.eventService.getEvents().subscribe({
+      next: () => {
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading events:', error);
+        this.handleError(error, 'Nie udało się załadować eventów.');
+        this.isLoading.set(false);
+      },
+    });
+  }
+
   retryLoad(): void {
-    this.loadPosts();
+    if (this.activeTab() === 'board') {
+      this.loadPosts();
+    } else if (this.activeTab() === 'events') {
+      this.loadEvents();
+    }
+  }
+
+  onTabChange(tab: 'board' | 'events' | 'groups'): void {
+    this.activeTab.set(tab);
+    this.errorMessage.set(null);
   }
 
   /**
