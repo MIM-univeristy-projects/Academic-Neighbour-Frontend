@@ -2,14 +2,13 @@
     <form [formGroup]="postForm" (ngSubmit)="onSubmit()" class="create-post-form">
         <div class="post-input-wrapper">
             <div class="user-avatar">
-                U
+
             </div>
 
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
                 <mat-label>Co nowego, sąsiedzie?</mat-label>
                 <textarea matInput formControlName="content" (focus)="onFocus()" [rows]="isExpanded() ? 5 : 1"
-                    placeholder="Podziel się swoimi myślami...">
-                </textarea>
+                    placeholder="Podziel się swoimi myślami..."></textarea>
                 @if (isExpanded()) {
                 <mat-hint align="end" [class]="characterCountColor()">
                     {{ characterCount() }} / 5000

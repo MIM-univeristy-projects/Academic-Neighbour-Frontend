@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, output, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -33,13 +34,14 @@ export class CreatePostFormComponent {
     readonly isExpanded = signal(false);
 
     readonly postForm = this.fb.group({
-        content: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(5000)]],
+        content: ['', [Validators.required, Validators.maxLength(5000)]],
     });
 
-    // Computed signals
+    private readonly formValue = toSignal(this.postForm.valueChanges, { initialValue: this.postForm.value });
+
     readonly characterCount = computed(() => {
-        const content = this.postForm.controls.content.value;
-        return content?.length || 0;
+        const content = this.formValue()?.content || '';
+        return content.length;
     });
 
     readonly characterCountColor = computed(() => {
