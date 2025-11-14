@@ -1,29 +1,31 @@
 export interface Post {
-    id: number;
-    text: string;
+    id?: number | null;
+    content: string;
     author_id: number;
-    created_at: string;
+    created_at?: string;
 }
 
-export interface Author {
-    id: number;
-    email: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-    role: string;
-    is_active: boolean;
-    created_at: string;
+/**
+ * Post creation request model
+ */
+export interface PostCreate {
+    content: string;
 }
 
+/**
+ * Post with author details response model
+ */
 export interface PostWithAuthor {
     id: number;
-    text: string;
+    content: string;
     author_id: number;
     created_at: string;
-    author: Author;
+    author_name: string;
 }
 
+/**
+ * @deprecated Use PostCreate instead
+ */
 export interface CreatePostDto {
-    text: string;
+    content: string;
 }

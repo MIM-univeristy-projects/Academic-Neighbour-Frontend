@@ -28,15 +28,21 @@ export class PostComponent {
     commentPost = output<number>();
 
     // Computed signals
-    readonly formattedDate = computed(() => this.getFormattedDate(this.post().created_at));
+    readonly formattedDate = computed(() => this.getFormattedDate(this.post().created_at || ''));
     readonly authorInitial = computed(() => `U${this.post().author_id}`);
 
     onLike(): void {
-        this.likePost.emit(this.post().id);
+        const postId = this.post().id;
+        if (postId) {
+            this.likePost.emit(postId);
+        }
     }
 
     onComment(): void {
-        this.commentPost.emit(this.post().id);
+        const postId = this.post().id;
+        if (postId) {
+            this.commentPost.emit(postId);
+        }
     }
 
     private getFormattedDate(dateString: string): string {

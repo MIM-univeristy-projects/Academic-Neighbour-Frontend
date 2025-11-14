@@ -2,7 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CreatePostDto, Post, PostWithAuthor } from '../models/post.model';
+import { LikesInfo, PostLike } from '../models/like.model';
+import { Post, PostCreate, PostWithAuthor } from '../models/post.model';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -38,7 +39,7 @@ export class PostService {
     /**
      * Create a new post
      */
-    createPost(postData: CreatePostDto): Observable<Post> {
+    createPost(postData: PostCreate): Observable<Post> {
         const currentUser = this.authService.currentUser();
 
         if (!currentUser?.id) {
@@ -46,7 +47,7 @@ export class PostService {
         }
 
         const postPayload: Partial<Post> = {
-            text: postData.text,
+            content: postData.content,
             author_id: currentUser.id
         };
 
@@ -65,16 +66,34 @@ export class PostService {
     /**
      * Like a post
      */
-    likePost(postId: number): Observable<Post> {
-        return this.http.post<Post>(`${this.apiUrl}/posts/${postId}/like`, {}).pipe(
-            tap(likedPost => {
-                // Update cache with liked post
-                this.postsCache.update(posts =>
-                    posts.map(post => post.id === postId ? likedPost : post)
-                );
-            }),
+    likePost(postId: number): Observable<PostLike> {
+        return this.http.post<PostLike>(`${this.apiUrl}/posts/${postId}/like`, {}).pipe(
             catchError(error => {
                 console.error('Failed to like post:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    /**
+     * Unlike a post
+     */
+    unlikePost(postId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/posts/${postId}/like`).pipe(
+            catchError(error => {
+                console.error('Failed to unlike post:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    /**
+     * Get likes information for a post
+     */
+    getLikesInfo(postId: number): Observable<LikesInfo> {
+        return this.http.get<LikesInfo>(`${this.apiUrl}/posts/${postId}/likes`).pipe(
+            catchError(error => {
+                console.error('Failed to fetch likes info:', error);
                 return throwError(() => error);
             })
         );

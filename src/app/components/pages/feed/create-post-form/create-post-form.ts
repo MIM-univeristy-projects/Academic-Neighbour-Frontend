@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { CreatePostDto } from '../../../../models/post.model';
+import { PostCreate } from '../../../../models/post.model';
 
 @Component({
     selector: 'app-create-post-form',
@@ -27,19 +27,19 @@ export class CreatePostFormComponent {
     private fb = inject(NonNullableFormBuilder);
 
     // Modern output() API
-    createPost = output<CreatePostDto>();
+    createPost = output<PostCreate>();
 
     // Signal-based state
     readonly isExpanded = signal(false);
 
     readonly postForm = this.fb.group({
-        text: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(5000)]],
+        content: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(5000)]],
     });
 
     // Computed signals
     readonly characterCount = computed(() => {
-        const text = this.postForm.controls.text.value;
-        return text?.length || 0;
+        const content = this.postForm.controls.content.value;
+        return content?.length || 0;
     });
 
     readonly characterCountColor = computed(() => {
@@ -60,8 +60,8 @@ export class CreatePostFormComponent {
 
     onSubmit(): void {
         if (this.postForm.valid) {
-            const postData: CreatePostDto = {
-                text: this.postForm.value.text!.trim(),
+            const postData: PostCreate = {
+                content: this.postForm.value.content!.trim(),
             };
             this.createPost.emit(postData);
             this.postForm.reset();

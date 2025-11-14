@@ -1,32 +1,66 @@
-export interface RegisterRequest {
-    email: string;
-    password: string;
-    first_name: string;
-    last_name: string;
-    username: string;
+/**
+ * User role enumeration
+ */
+export enum UserRole {
+    USER = 'user',
+    ADMIN = 'admin'
 }
 
+/**
+ * User creation request model
+ */
+export interface UserCreate {
+    email: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+}
+
+/**
+ * @deprecated Use UserCreate instead
+ */
+export type RegisterRequest = UserCreate;
+
+/**
+ * Login request model
+ */
 export interface LoginRequest {
     username: string;
     password: string;
 }
 
-export interface User {
+/**
+ * User read model (API response)
+ */
+export interface UserRead {
     id: number;
     email: string;
     username: string;
     first_name: string;
     last_name: string;
-    role: string;
+    role: UserRole | string;
     is_active: boolean;
     created_at: string;
 }
 
-export interface AuthResponse {
+/**
+ * @deprecated Use UserRead instead
+ */
+export type User = UserRead;
+
+/**
+ * Token response with user information
+ */
+export interface TokenWithUser {
     access_token: string;
     token_type: string;
-    user: User;
+    user: UserRead;
 }
 
-export type RegisterResponse = AuthResponse
-export type LoginResponse = AuthResponse
+/**
+ * @deprecated Use TokenWithUser instead
+ */
+export type AuthResponse = TokenWithUser;
+export type RegisterResponse = TokenWithUser;
+export type LoginResponse = TokenWithUser;

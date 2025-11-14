@@ -12,12 +12,12 @@ describe('PostComponent', () => {
 
         fixture = TestBed.createComponent(PostComponent);
         component = fixture.componentInstance;
-        component.post = {
+        fixture.componentRef.setInput('post', {
             id: 1,
             text: 'Test content',
             author_id: 1,
             created_at: new Date().toISOString(),
-        };
+        });
         fixture.detectChanges();
     });
 
