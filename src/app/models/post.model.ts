@@ -2,6 +2,9 @@ export interface Post {
     id?: number | null;
     content: string;
     author_id: number;
+    author_username?: string;
+    author_first_name?: string;
+    author_last_name?: string;
     group_id?: number | null;
     created_at?: string;
     likes_count?: number;

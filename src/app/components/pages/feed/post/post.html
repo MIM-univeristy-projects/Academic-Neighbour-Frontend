@@ -9,7 +9,7 @@
         <div class="flex-1 min-w-0">
             <button (click)="onNavigateToProfile()" class="text-left hover:underline">
                 <h3 class="text-lg font-semibold text-gray-900 truncate">
-                    Użytkownik #{{ post().author_id }}
+                    {{ authorName() }}
                 </h3>
             </button>
             <p class="text-sm text-gray-500">

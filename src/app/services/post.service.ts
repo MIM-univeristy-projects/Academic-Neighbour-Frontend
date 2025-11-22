@@ -6,6 +6,7 @@ import { LikesInfo, PostLike } from '../models/like.model';
 import { Post, PostCreate, PostWithAuthor } from '../models/post.model';
 import { AuthService } from './auth.service';
 import { CommentService } from './comment.service';
+import { UserService } from './user.service';
 
 @Injectable({
     providedIn: 'root',
@@ -14,6 +15,7 @@ export class PostService {
     private http = inject(HttpClient);
     private authService = inject(AuthService);
     private commentService = inject(CommentService);
+    private userService = inject(UserService);
 
     private readonly apiUrl = environment.apiUrl;
 
@@ -73,15 +75,23 @@ export class PostService {
             catchError(() => of(0))
         );
 
+        const author$ = this.userService.getUserProfile(post.author_id).pipe(
+            catchError(() => of(null))
+        );
+
         return forkJoin({
             likes: likesInfo$,
-            commentsCount: comments$
+            commentsCount: comments$,
+            author: author$
         }).pipe(
-            map(({ likes, commentsCount }) => ({
+            map(({ likes, commentsCount, author }) => ({
                 ...post,
                 likes_count: likes.likes_count,
                 liked_by_current_user: likes.liked_by_current_user,
-                comments_count: commentsCount
+                comments_count: commentsCount,
+                author_username: author?.username,
+                author_first_name: author?.first_name,
+                author_last_name: author?.last_name
             }))
         );
     }

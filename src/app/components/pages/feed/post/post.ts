@@ -47,7 +47,26 @@ export class PostComponent {
 
     // Computed signals
     readonly formattedDate = computed(() => this.getFormattedDate(this.post().created_at || ''));
-    readonly authorInitial = computed(() => `U${this.post().author_id}`);
+    readonly authorInitial = computed(() => {
+        const post = this.post();
+        if (post.author_first_name && post.author_last_name) {
+            return `${post.author_first_name[0]}${post.author_last_name[0]}`.toUpperCase();
+        }
+        if (post.author_username) {
+            return post.author_username.substring(0, 2).toUpperCase();
+        }
+        return 'U';
+    });
+    readonly authorName = computed(() => {
+        const post = this.post();
+        if (post.author_first_name && post.author_last_name) {
+            return `${post.author_first_name} ${post.author_last_name}`;
+        }
+        if (post.author_username) {
+            return post.author_username;
+        }
+        return `Użytkownik #${post.author_id}`;
+    });
 
     onLike(): void {
         const postId = this.post().id;
