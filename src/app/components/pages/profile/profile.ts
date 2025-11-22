@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute } from '@angular/router';
+import { UserRead } from '../../../models/auth.model';
 import { ProfileComment } from '../../../models/review.model';
 import { AuthService } from '../../../services/auth.service';
 import { ReviewService } from '../../../services/review.service';
@@ -29,14 +30,17 @@ import { ProfileCommentListComponent } from './profile-comment-list/profile-comm
     templateUrl: './profile.html',
     styleUrl: './profile.css',
 })
-export class ProfilePage {
+export class ProfilePage implements OnInit {
     private authService = inject(AuthService);
     private userService = inject(UserService);
     private reviewService = inject(ReviewService);
     private route = inject(ActivatedRoute);
 
     readonly currentUser = this.authService.currentUser;
+    readonly profileUser = signal<UserRead | null>(null);
+    readonly profileUserId = signal<number | null>(null);
     readonly isLoading = signal(false);
+    readonly isLoadingProfile = signal(false);
     readonly comments = signal<ProfileComment[]>([]);
     readonly showCommentForm = signal(false);
     readonly isLoadingComments = signal(false);
@@ -44,8 +48,14 @@ export class ProfilePage {
     readonly commentError = signal<string | null>(null);
     readonly resetCommentForm = signal(false);
 
+    readonly isOwnProfile = computed(() => {
+        const current = this.currentUser();
+        const profileId = this.profileUserId();
+        return current && profileId && current.id === profileId;
+    });
+
     readonly userInitials = computed(() => {
-        const user = this.currentUser();
+        const user = this.profileUser();
         if (!user) return 'U';
 
         const firstInitial = user.first_name?.[0]?.toUpperCase() || '';
@@ -54,22 +64,58 @@ export class ProfilePage {
     });
 
     readonly userFullName = computed(() => {
-        const user = this.currentUser();
-        if (!user) return 'Użytkownik';
+        const user = this.profileUser();
+        if (!user) return 'Ładowanie...';
         return `${user.first_name} ${user.last_name}`.trim() || user.username || 'Użytkownik';
     });
 
     constructor() {
-        this.loadComments();
+        // React to route param changes
+        effect(() => {
+            this.route.paramMap.subscribe(params => {
+                const id = params.get('id');
+                if (id) {
+                    const userId = Number(id);
+                    this.profileUserId.set(userId);
+                    this.loadProfile(userId);
+                    this.loadComments(userId);
+                }
+            });
+        });
     }
 
-    loadComments(): void {
-        const user = this.currentUser();
-        if (!user?.id) return;
+    ngOnInit(): void {
+        // Initial load
+        const id = this.route.snapshot.paramMap.get('id');
+        if (id) {
+            const userId = Number(id);
+            this.profileUserId.set(userId);
+            this.loadProfile(userId);
+            this.loadComments(userId);
+        }
+    }
+
+    loadProfile(userId: number): void {
+        this.isLoadingProfile.set(true);
+
+        this.userService.getUserProfile(userId).subscribe({
+            next: (user: UserRead) => {
+                this.profileUser.set(user);
+                this.isLoadingProfile.set(false);
+            },
+            error: (error: Error) => {
+                console.error('Failed to load profile:', error);
+                this.isLoadingProfile.set(false);
+            },
+        });
+    }
+
+    loadComments(userId: number): void {
+        if (!userId) return;
 
         this.isLoadingComments.set(true);
 
-        this.reviewService.getUserComments(user.id).subscribe({
+        this.reviewService.getUserComments(userId).subscribe({
             next: (comments) => {
                 this.comments.set(comments);
                 this.isLoadingComments.set(false);
@@ -86,14 +132,14 @@ export class ProfilePage {
     }
 
     onSubmitComment(content: string): void {
-        const user = this.currentUser();
-        if (!user?.id) return;
+        const userId = this.profileUserId();
+        if (!userId) return;
 
         this.isSubmittingComment.set(true);
         this.commentError.set(null);
 
-        this.reviewService.createComment(user.id, content).subscribe({
-            next: (newComment) => {
+        this.reviewService.createComment(userId, content).subscribe({
+            next: (newComment: ProfileComment) => {
                 this.isSubmittingComment.set(false);
                 this.commentError.set(null);
 
@@ -105,7 +151,7 @@ export class ProfilePage {
                 this.showCommentForm.set(false);
                 this.comments.update(comments => [newComment, ...comments]);
             },
-            error: (error) => {
+            error: (error: { error?: { detail?: string | { msg: string }[] }; message?: string }) => {
                 console.error('Failed to submit comment:', error);
                 this.isSubmittingComment.set(false);
 

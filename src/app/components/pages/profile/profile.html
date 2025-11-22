@@ -30,13 +30,13 @@
                         <!-- User Info -->
                         <div class="flex-1 text-center sm:text-left">
                             <h2 class="text-3xl font-bold text-gray-900 mb-2">{{ userFullName() }}</h2>
-                            <p class="text-lg text-gray-600 mb-1">&#64;{{ currentUser()?.username }}</p>
-                            <p class="text-gray-500">{{ currentUser()?.email }}</p>
+                            <p class="text-lg text-gray-600 mb-1">&#64;{{ profileUser()?.username }}</p>
+                            <p class="text-gray-500">{{ profileUser()?.email }}</p>
                             <div class="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
                                 <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
-                                    {{ currentUser()?.role === 'admin' ? 'Administrator' : 'Użytkownik' }}
+                                    {{ profileUser()?.role === 'admin' ? 'Administrator' : 'Użytkownik' }}
                                 </span>
-                                @if (currentUser()?.is_active) {
+                                @if (profileUser()?.is_active) {
                                 <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                                     Aktywny
                                 </span>
@@ -57,23 +57,23 @@
                     <div class="space-y-3">
                         <div class="flex items-center justify-between py-2 border-b border-gray-100">
                             <span class="text-gray-600">Imię:</span>
-                            <span class="font-medium text-gray-900">{{ currentUser()?.first_name }}</span>
+                            <span class="font-medium text-gray-900">{{ profileUser()?.first_name }}</span>
                         </div>
                         <div class="flex items-center justify-between py-2 border-b border-gray-100">
                             <span class="text-gray-600">Nazwisko:</span>
-                            <span class="font-medium text-gray-900">{{ currentUser()?.last_name }}</span>
+                            <span class="font-medium text-gray-900">{{ profileUser()?.last_name }}</span>
                         </div>
                         <div class="flex items-center justify-between py-2 border-b border-gray-100">
                             <span class="text-gray-600">Nazwa użytkownika:</span>
-                            <span class="font-medium text-gray-900">{{ currentUser()?.username }}</span>
+                            <span class="font-medium text-gray-900">{{ profileUser()?.username }}</span>
                         </div>
                         <div class="flex items-center justify-between py-2 border-b border-gray-100">
                             <span class="text-gray-600">Email:</span>
-                            <span class="font-medium text-gray-900">{{ currentUser()?.email }}</span>
+                            <span class="font-medium text-gray-900">{{ profileUser()?.email }}</span>
                         </div>
                         <div class="flex items-center justify-between py-2">
                             <span class="text-gray-600">Data utworzenia:</span>
-                            <span class="font-medium text-gray-900">{{ currentUser()?.created_at | date:'medium'
+                            <span class="font-medium text-gray-900">{{ profileUser()?.created_at | date:'medium'
                                 }}</span>
                         </div>
                     </div>
