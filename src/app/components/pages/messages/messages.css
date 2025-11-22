@@ -56,3 +56,26 @@
     transform: translateX(4px);
     transition: transform 0.2s ease;
 }
+
+/* Tab styling */
+::ng-deep .messages-tabs .mat-mdc-tab-labels {
+    justify-content: center;
+}
+
+::ng-deep .messages-tabs .mat-mdc-tab {
+    min-width: 120px;
+}
+
+::ng-deep .messages-tabs .mat-mdc-tab-label-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+::ng-deep .messages-tabs .mat-mdc-tab.mat-mdc-tab-active {
+    color: #f59e0b;
+}
+
+::ng-deep .messages-tabs .mat-ink-bar {
+    background-color: #f59e0b;
+}

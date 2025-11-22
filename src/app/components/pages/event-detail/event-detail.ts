@@ -36,6 +36,8 @@ export class EventDetailPage implements OnInit {
     event = signal<Event | null>(null);
     attendees = signal<EventAttendeeWithUser[]>([]);
     isLoading = signal<boolean>(false);
+    isLoadingAttendees = signal<boolean>(false);
+    isRegistering = signal<boolean>(false);
     showAttendees = signal<boolean>(false);
     errorMessage = signal<string>('');
 
@@ -53,7 +55,7 @@ export class EventDetailPage implements OnInit {
         const user = this.currentUser();
         const attendeesList = this.attendees();
         if (!user) return null;
-        return attendeesList.find(a => a.user_id === user.id);
+        return attendeesList.find(a => a.user.id === user.id);
     });
 
     readonly isAttending = computed(() => {
@@ -67,7 +69,10 @@ export class EventDetailPage implements OnInit {
     });
 
     readonly isRegistered = computed(() => {
-        return !!this.userAttendance();
+        const attendance = this.userAttendance();
+        // User is only registered if they have ATTENDING or INTERESTED status
+        return attendance?.status === AttendanceStatus.ATTENDING ||
+            attendance?.status === AttendanceStatus.INTERESTED;
     });
 
     readonly attendingCount = computed(() => {
@@ -119,13 +124,21 @@ export class EventDetailPage implements OnInit {
      * Load event attendees
      */
     private loadAttendees(eventId: number): void {
+        this.isLoadingAttendees.set(true);
         this.eventService.getEventAttendees(eventId).subscribe({
             next: (attendees) => {
+                console.log('Loaded attendees:', attendees);
                 this.attendees.set(attendees);
+                this.isLoadingAttendees.set(false);
             },
             error: (error) => {
                 console.error('Error loading attendees:', error);
-                // Non-critical error, don't show to user
+                this.isLoadingAttendees.set(false);
+                // If endpoint doesn't exist yet, initialize with empty array
+                if (error.status === 404) {
+                    console.warn('Attendees endpoint not implemented yet');
+                    this.attendees.set([]);
+                }
             }
         });
     }
@@ -137,13 +150,31 @@ export class EventDetailPage implements OnInit {
         const event = this.event();
         if (!event?.id) return;
 
+        this.isRegistering.set(true);
         this.eventService.registerForEvent(event.id).subscribe({
-            next: () => {
+            next: (attendee) => {
+                console.log('Successfully registered:', attendee);
+                this.isRegistering.set(false);
+                // Reload attendees to show updated list
                 this.loadAttendees(event.id!);
             },
             error: (error) => {
                 console.error('Error registering for event:', error);
-                alert('Nie udało się zarejestrować na event');
+                this.isRegistering.set(false);
+
+                // Show more specific error message
+                let errorMsg = 'Nie udało się zarejestrować na event';
+                if (error.status === 400) {
+                    errorMsg = 'Jesteś już zarejestrowany na ten event';
+                } else if (error.status === 401) {
+                    errorMsg = 'Musisz być zalogowany, aby się zarejestrować';
+                } else if (error.status === 404) {
+                    errorMsg = 'Event nie został znaleziony';
+                } else if (error.error?.detail) {
+                    errorMsg = error.error.detail;
+                }
+
+                alert(errorMsg);
             }
         });
     }
@@ -155,19 +186,30 @@ export class EventDetailPage implements OnInit {
         const event = this.event();
         if (!event?.id) return;
 
+        this.isRegistering.set(true);
         this.eventService.updateRegistrationStatus(event.id, status).subscribe({
-            next: () => {
+            next: (attendee) => {
+                console.log('Successfully updated status:', attendee);
+                this.isRegistering.set(false);
+                // Reload attendees to show updated list
                 this.loadAttendees(event.id!);
             },
             error: (error) => {
                 console.error('Error updating status:', error);
-                alert('Nie udało się zaktualizować statusu');
+                this.isRegistering.set(false);
+
+                let errorMsg = 'Nie udało się zaktualizować statusu';
+                if (error.error?.detail) {
+                    errorMsg = error.error.detail;
+                }
+
+                alert(errorMsg);
             }
         });
     }
 
     /**
-     * Unregister from event
+     * Unregister from event (set status to NOT_ATTENDING)
      */
     onUnregisterFromEvent(): void {
         const event = this.event();
@@ -177,13 +219,25 @@ export class EventDetailPage implements OnInit {
             return;
         }
 
-        this.eventService.unregisterFromEvent(event.id).subscribe({
+        this.isRegistering.set(true);
+        // Update status to NOT_ATTENDING to effectively "leave" the event
+        this.eventService.updateRegistrationStatus(event.id, AttendanceStatus.NOT_ATTENDING).subscribe({
             next: () => {
+                console.log('Successfully unregistered from event');
+                this.isRegistering.set(false);
+                // Reload attendees to show updated list (user will no longer appear)
                 this.loadAttendees(event.id!);
             },
             error: (error) => {
                 console.error('Error unregistering from event:', error);
-                alert('Nie udało się wypisać z eventu');
+                this.isRegistering.set(false);
+
+                let errorMsg = 'Nie udało się wypisać z eventu';
+                if (error.error?.detail) {
+                    errorMsg = error.error.detail;
+                }
+
+                alert(errorMsg);
             }
         });
     }

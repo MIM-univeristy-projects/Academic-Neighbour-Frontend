@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute } from '@angular/router';
 import { UserRead } from '../../../models/auth.model';
 import { ProfileComment } from '../../../models/review.model';
@@ -23,6 +24,7 @@ import { ProfileCommentListComponent } from './profile-comment-list/profile-comm
         MatButtonModule,
         MatCardModule,
         MatProgressSpinnerModule,
+        MatTooltipModule,
         FeedHeaderComponent,
         ProfileCommentFormComponent,
         ProfileCommentListComponent,
@@ -128,12 +130,23 @@ export class ProfilePage implements OnInit {
     }
 
     toggleCommentForm(): void {
+        // Prevent users from commenting on their own profile
+        if (this.isOwnProfile()) {
+            alert('Nie możesz dodawać komentarzy na swoim własnym profilu');
+            return;
+        }
         this.showCommentForm.update(show => !show);
     }
 
     onSubmitComment(content: string): void {
         const userId = this.profileUserId();
         if (!userId) return;
+
+        // Double check - prevent commenting on own profile
+        if (this.isOwnProfile()) {
+            this.commentError.set('Nie możesz dodawać komentarzy na swoim własnym profilu');
+            return;
+        }
 
         this.isSubmittingComment.set(true);
         this.commentError.set(null);

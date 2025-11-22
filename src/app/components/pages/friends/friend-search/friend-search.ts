@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { UserRead } from '../../../../models/auth.model';
+import { AuthService } from '../../../../services/auth.service';
 import { FriendshipService } from '../../../../services/friendship.service';
 import { UserService } from '../../../../services/user.service';
 
@@ -32,6 +33,7 @@ import { UserService } from '../../../../services/user.service';
 export class FriendSearchComponent {
     private userService = inject(UserService);
     private friendshipService = inject(FriendshipService);
+    private authService = inject(AuthService);
     private router = inject(Router);
 
     // Form control for search input
@@ -101,8 +103,11 @@ export class FriendSearchComponent {
 
         this.userService.searchUsers(query).subscribe({
             next: (users) => {
-                // Filter out already existing friends and pending requests
+                const currentUserId = this.authService.currentUser()?.id;
+
+                // Filter out current user, existing friends, and pending requests
                 const filteredUsers = users.filter(user =>
+                    user.id !== currentUserId &&
                     !this.existingFriendIds().has(user.id) &&
                     !this.pendingRequestIds().has(user.id) &&
                     !this.sentRequestIds().has(user.id)

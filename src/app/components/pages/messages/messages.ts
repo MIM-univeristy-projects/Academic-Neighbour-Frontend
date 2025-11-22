@@ -8,11 +8,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription } from 'rxjs';
+import { UserRead } from '../../../models/auth.model';
 import { Conversation, Message } from '../../../models/conversation.model';
 import { AuthService } from '../../../services/auth.service';
 import { ConversationService } from '../../../services/conversation.service';
+import { FriendshipService } from '../../../services/friendship.service';
 import { ConnectionStatus, WebSocketService } from '../../../services/websocket.service';
 import { FeedHeaderComponent } from '../feed/feed-header/feed-header';
 
@@ -30,6 +33,7 @@ import { FeedHeaderComponent } from '../feed/feed-header/feed-header';
         MatBadgeModule,
         MatProgressSpinnerModule,
         MatTooltipModule,
+        MatTabsModule,
         FeedHeaderComponent
     ],
     templateUrl: './messages.html',
@@ -39,15 +43,21 @@ export class MessagesPage implements OnInit, OnDestroy {
     private conversationService = inject(ConversationService);
     private wsService = inject(WebSocketService);
     private authService = inject(AuthService);
+    private friendshipService = inject(FriendshipService);
 
     // State signals
     conversations = signal<Conversation[]>([]);
+    friends = signal<UserRead[]>([]);
     selectedConversation = signal<Conversation | null>(null);
+    selectedFriend = signal<UserRead | null>(null);
     messages = signal<Message[]>([]);
     messageInput = signal<string>('');
+    activeTab = signal<'conversations' | 'friends'>('conversations');
     isLoadingConversations = signal<boolean>(false);
+    isLoadingFriends = signal<boolean>(false);
     isLoadingMessages = signal<boolean>(false);
     isSendingMessage = signal<boolean>(false);
+    isCreatingConversation = signal<boolean>(false);
 
     // WebSocket connection status
     readonly connectionStatus = this.wsService.connectionStatus;
@@ -82,6 +92,7 @@ export class MessagesPage implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.loadConversations();
+        this.loadFriends();
         this.setupWebSocketSubscriptions();
     }
 
@@ -97,7 +108,16 @@ export class MessagesPage implements OnInit, OnDestroy {
         // Subscribe to incoming messages
         this.subscriptions.push(
             this.wsService.messages$.subscribe((message) => {
-                this.messages.update(msgs => [...msgs, message]);
+                console.log('Received WebSocket message:', message);
+                // Only add message if it's for the currently selected conversation
+                const selectedConv = this.selectedConversation();
+                if (selectedConv && message.conversation_id === selectedConv.id) {
+                    // Check if message already exists to avoid duplicates
+                    const exists = this.messages().some(m => m.id === message.id);
+                    if (!exists) {
+                        this.messages.update(msgs => [...msgs, message]);
+                    }
+                }
             })
         );
 
@@ -118,18 +138,69 @@ export class MessagesPage implements OnInit, OnDestroy {
     }
 
     /**
-     * Load all conversations
+     * Load all conversations and their participants
      */
     loadConversations(): void {
         this.isLoadingConversations.set(true);
         this.conversationService.getConversations().subscribe({
             next: (conversations) => {
+                console.log('Loaded conversations:', conversations);
+
+                // For each conversation, fetch participants and set display name
+                const currentUserId = this.currentUser()?.id;
+                conversations.forEach(conv => {
+                    this.conversationService.getParticipants(conv.id).subscribe({
+                        next: (participants) => {
+                            // Store participants in the conversation object
+                            conv.participants = participants.map(p => ({
+                                id: p.id,
+                                username: p.username,
+                                first_name: p.first_name || '',
+                                last_name: p.last_name || ''
+                            }));
+
+                            // Find the other participant (not the current user)
+                            const otherParticipant = participants.find(p => p.id !== currentUserId);
+                            if (otherParticipant) {
+                                const displayName = `${otherParticipant.first_name} ${otherParticipant.last_name}`.trim()
+                                    || otherParticipant.username;
+                                conv.displayName = displayName;
+                            } else {
+                                conv.displayName = conv.title;
+                            }
+                        },
+                        error: (error) => {
+                            console.error('Error loading participants for conversation', conv.id, error);
+                            conv.displayName = conv.title;
+                        }
+                    });
+                });
+
+                // Note: The backend should prevent duplicates, but we'll keep all conversations for now
+                // since they might have different message histories
                 this.conversations.set(conversations);
                 this.isLoadingConversations.set(false);
             },
             error: (error) => {
                 console.error('Error loading conversations:', error);
                 this.isLoadingConversations.set(false);
+            }
+        });
+    }
+
+    /**
+     * Load all friends
+     */
+    loadFriends(): void {
+        this.isLoadingFriends.set(true);
+        this.friendshipService.getAcceptedFriends().subscribe({
+            next: (friends) => {
+                this.friends.set(friends);
+                this.isLoadingFriends.set(false);
+            },
+            error: (error) => {
+                console.error('Error loading friends:', error);
+                this.isLoadingFriends.set(false);
             }
         });
     }
@@ -148,6 +219,86 @@ export class MessagesPage implements OnInit, OnDestroy {
 
         // Connect to WebSocket for real-time updates
         this.wsService.connect(conversation.id);
+    }
+
+    /**
+     * Select a friend and start a conversation
+     */
+    selectFriend(friend: UserRead): void {
+        this.selectedFriend.set(friend);
+
+        // First, check if a conversation with this friend already exists
+        const existingConversation = this.findConversationWithUser(friend.id);
+
+        if (existingConversation) {
+            console.log('Found existing conversation with friend:', existingConversation);
+            // Switch to conversations tab and select the existing conversation
+            this.activeTab.set('conversations');
+            this.selectedFriend.set(null);
+            this.selectConversation(existingConversation);
+            return;
+        }
+
+        // No existing conversation found, create a new one
+        this.isCreatingConversation.set(true);
+
+        this.conversationService.createConversation({
+            participant_id: friend.id
+        }).subscribe({
+            next: (conversation) => {
+                console.log('Created new conversation:', conversation);
+                this.isCreatingConversation.set(false);
+
+                // Add to conversations list
+                this.conversations.update(convs => [conversation, ...convs]);
+
+                // Fetch participants for the new conversation to set displayName
+                const currentUserId = this.currentUser()?.id;
+                this.conversationService.getParticipants(conversation.id).subscribe({
+                    next: (participants) => {
+                        const otherParticipant = participants.find(p => p.id !== currentUserId);
+                        if (otherParticipant) {
+                            const displayName = `${otherParticipant.first_name} ${otherParticipant.last_name}`.trim()
+                                || otherParticipant.username;
+                            conversation.displayName = displayName;
+                            // Update the conversation in the list
+                            this.conversations.update(convs =>
+                                convs.map(c => c.id === conversation.id ? conversation : c)
+                            );
+                        }
+                    }
+                });
+
+                // Switch to conversations tab and select the conversation
+                this.activeTab.set('conversations');
+                this.selectedFriend.set(null);
+                this.selectConversation(conversation);
+            },
+            error: (error) => {
+                console.error('Error creating conversation:', error);
+                this.isCreatingConversation.set(false);
+                alert('Nie udało się rozpocząć rozmowy');
+            }
+        });
+    }
+
+    /**
+     * Find a conversation that includes a specific user
+     */
+    private findConversationWithUser(userId: number): Conversation | null {
+        const currentUserId = this.currentUser()?.id;
+        if (!currentUserId) return null;
+
+        // Check if any conversation has participants that include both the current user and the target user
+        for (const conv of this.conversations()) {
+            if (conv.participants && conv.participants.length === 2) {
+                const participantIds = conv.participants.map(p => p.id);
+                if (participantIds.includes(currentUserId) && participantIds.includes(userId)) {
+                    return conv;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -178,10 +329,13 @@ export class MessagesPage implements OnInit, OnDestroy {
 
         // If WebSocket is connected, send via WebSocket
         if (this.wsService.isConnected()) {
+            console.log('Sending message via WebSocket:', content);
             this.wsService.sendMessage(content);
             this.messageInput.set('');
+            // Note: The message will be added to the UI when we receive it back from the WebSocket
         } else {
             // Fallback to REST API
+            console.log('WebSocket not connected, sending via REST API');
             this.sendMessageViaREST(conversation.id, content);
         }
     }
@@ -203,6 +357,13 @@ export class MessagesPage implements OnInit, OnDestroy {
                 this.isSendingMessage.set(false);
             }
         });
+    }
+
+    /**
+     * Handle tab change
+     */
+    onTabChange(index: number): void {
+        this.activeTab.set(index === 0 ? 'conversations' : 'friends');
     }
 
     /**
