@@ -117,7 +117,9 @@
             } @else {
             <div class="space-y-4">
                 @for (event of events(); track event.id) {
-                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div (click)="onNavigateToEvent(event.id)" (keyup.enter)="onNavigateToEvent(event.id)" tabindex="0"
+                    role="button"
+                    class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-all cursor-pointer">
                     <div class="flex items-start gap-4">
                         <div
                             class="shrink-0 w-16 h-16 bg-amber-100 rounded-xl flex flex-col items-center justify-center">
@@ -125,7 +127,7 @@
                         </div>
                         <div class="grow">
                             <h3 class="text-xl font-bold text-gray-800 mb-2">{{ event.title }}</h3>
-                            <p class="text-gray-600 mb-3">{{ event.description }}</p>
+                            <p class="text-gray-600 mb-3 line-clamp-2">{{ event.description }}</p>
                             <div class="flex flex-wrap gap-4 text-sm text-gray-500">
                                 <div class="flex items-center gap-1">
                                     <mat-icon class="text-base">schedule</mat-icon>

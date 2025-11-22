@@ -53,3 +53,16 @@ export interface EventAttendee {
     status?: AttendanceStatus;
     joined_at?: string;
 }
+
+/**
+ * Event attendee with user details (for displaying attendee lists)
+ */
+export interface EventAttendeeWithUser {
+    id: number;
+    user_id: number;
+    event_id: number;
+    status: AttendanceStatus;
+    joined_at: string;
+    user_name: string;
+    user_email?: string;
+}

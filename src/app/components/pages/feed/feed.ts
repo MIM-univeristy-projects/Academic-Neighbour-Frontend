@@ -267,6 +267,12 @@ export class Feed {
     this.router.navigate(['/group', groupId]);
   }
 
+  onNavigateToEvent(eventId: number | null | undefined): void {
+    if (eventId) {
+      this.router.navigate(['/event', eventId]);
+    }
+  }
+
   getGroupInitials(name: string): string {
     const words = name.trim().split(' ');
     if (words.length >= 2) {

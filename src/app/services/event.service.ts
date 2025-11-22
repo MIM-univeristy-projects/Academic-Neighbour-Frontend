@@ -6,6 +6,7 @@ import {
     AttendanceStatus,
     Event,
     EventAttendee,
+    EventAttendeeWithUser,
     EventCreate,
     EventUpdate
 } from '../models/event.model';
@@ -145,6 +146,34 @@ export class EventService {
         ).pipe(
             catchError(error => {
                 console.error('Failed to update registration status:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    /**
+     * Get attendees for a specific event
+     * @param eventId - The ID of the event
+     * @returns Observable of event attendees array with user details
+     */
+    getEventAttendees(eventId: number): Observable<EventAttendeeWithUser[]> {
+        return this.http.get<EventAttendeeWithUser[]>(`${this.apiUrl}/events/${eventId}/attendees`).pipe(
+            catchError(error => {
+                console.error('Failed to fetch event attendees:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    /**
+     * Unregister from an event (delete registration)
+     * @param eventId - The ID of the event to unregister from
+     * @returns Observable that completes on success
+     */
+    unregisterFromEvent(eventId: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/events/${eventId}/register`).pipe(
+            catchError(error => {
+                console.error('Failed to unregister from event:', error);
                 return throwError(() => error);
             })
         );
