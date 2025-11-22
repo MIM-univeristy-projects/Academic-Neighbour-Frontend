@@ -23,6 +23,11 @@ export const protectedRoutes: Routes = [
         loadComponent: () => import('../components/pages/profile/profile').then(m => m.ProfilePage)
     },
     {
+        title: 'Grupy',
+        path: 'groups',
+        loadComponent: () => import('../components/pages/groups/groups').then(m => m.GroupsPage)
+    },
+    {
         path: '',
         redirectTo: 'feed',
         pathMatch: 'full'

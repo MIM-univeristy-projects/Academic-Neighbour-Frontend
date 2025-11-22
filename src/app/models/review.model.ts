@@ -1,35 +1,18 @@
 /**
- * User review model
+ * Profile comment from the API (ProfileCommentWithAuthor schema)
  */
-export interface UserReview {
-    id?: number;
-    reviewer_id: number;
-    reviewed_user_id: number;
-    rating: number;
-    comment: string;
-    created_at?: string;
-    reviewer_name?: string;
+export interface ProfileComment {
+    id: number;
+    content: string;
+    author_id: number;
+    author_name: string;
+    profile_user_id: number;
+    created_at: string;
 }
 
 /**
- * Review creation request model
+ * Request model for creating/updating profile comments
  */
-export interface ReviewCreate {
-    rating: number;
-    comment: string;
-}
-
-/**
- * Review statistics model
- */
-export interface ReviewStats {
-    average_rating: number;
-    total_reviews: number;
-    rating_distribution: {
-        1: number;
-        2: number;
-        3: number;
-        4: number;
-        5: number;
-    };
+export interface ProfileCommentCreate {
+    content: string;
 }

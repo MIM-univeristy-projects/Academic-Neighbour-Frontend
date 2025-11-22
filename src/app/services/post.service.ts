@@ -27,9 +27,11 @@ export class PostService {
 
     /**
      * Get all posts with likes and comments information
+     * Filters out posts associated with groups (only returns wall posts)
      */
     getPosts(): Observable<Post[]> {
         return this.http.get<Post[]>(`${this.apiUrl}/posts/`).pipe(
+            map(posts => posts.filter(post => !post.group_id)), // Filter out group posts
             switchMap(posts => {
                 if (posts.length === 0) {
                     this.postsCache.set(posts);

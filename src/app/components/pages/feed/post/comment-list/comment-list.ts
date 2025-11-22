@@ -3,6 +3,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import { CommentRequest, CommentWithAuthor } from '../../../../../models/comment.model';
 import { AuthService } from '../../../../../services/auth.service';
 import { CommentFormComponent } from '../comment-form/comment-form';
@@ -22,6 +23,7 @@ import { CommentFormComponent } from '../comment-form/comment-form';
 })
 export class CommentListComponent {
     private authService = inject(AuthService);
+    private router = inject(Router);
 
     // Inputs
     comments = input.required<CommentWithAuthor[]>();
@@ -97,5 +99,9 @@ export class CommentListComponent {
 
     getAuthorInitial(authorId: number): string {
         return `U${authorId}`;
+    }
+
+    navigateToProfile(authorId: number): void {
+        this.router.navigate(['/profile', authorId]);
     }
 }

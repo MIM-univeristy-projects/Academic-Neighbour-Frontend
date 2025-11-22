@@ -80,61 +80,52 @@
                 </div>
             </mat-card>
 
-            <!-- Reviews Section -->
+            <!-- Comments Section -->
             <mat-card class="shadow-lg! rounded-2xl!">
                 <div class="p-6">
-                    <!-- Reviews Header with Stats -->
+                    <!-- Comments Header -->
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h3 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                                <mat-icon class="text-amber-500">rate_review</mat-icon>
-                                Opinie
+                                <mat-icon class="text-amber-500">comment</mat-icon>
+                                Komentarze
                             </h3>
-                            @if (reviewStats()) {
-                            <div class="flex items-center gap-3 mt-2">
-                                <div class="flex items-center gap-1">
-                                    @for (filled of getStars(getRoundedRating()); track $index) {
-                                    <mat-icon [class]="filled ? 'text-amber-500' : 'text-gray-300'"
-                                        class="text-2xl! w-6! h-6!">
-                                        {{ filled ? 'star' : 'star_border' }}
-                                    </mat-icon>
-                                    }
-                                </div>
-                                <span class="text-xl font-semibold text-gray-900">
-                                    {{ reviewStats()!.average_rating.toFixed(1) }}
-                                </span>
-                                <span class="text-gray-500">
-                                    ({{ reviewStats()!.total_reviews }} {{ reviewStats()!.total_reviews === 1 ? 'opinia'
-                                    : 'opinii' }})
-                                </span>
-                            </div>
-                            }
+                            <span class="text-gray-500 mt-1">
+                                {{ comments().length }} {{ comments().length === 1 ? 'komentarz' : comments().length > 1
+                                && comments().length < 5 ? 'komentarze' : 'komentarzy' }} </span>
                         </div>
 
-                        @if (canLeaveReview()) {
-                        <button mat-raised-button (click)="toggleReviewForm()"
+                        <button mat-raised-button (click)="toggleCommentForm()"
                             class="bg-linear-to-r from-amber-500 to-pink-500 text-white">
-                            <mat-icon>{{ showReviewForm() ? 'close' : 'rate_review' }}</mat-icon>
-                            <span class="ml-1">{{ showReviewForm() ? 'Anuluj' : 'Wystaw opinię' }}</span>
+                            <mat-icon>{{ showCommentForm() ? 'close' : 'add_comment' }}</mat-icon>
+                            <span class="ml-1">{{ showCommentForm() ? 'Anuluj' : 'Dodaj komentarz' }}</span>
                         </button>
-                        }
                     </div>
 
-                    <!-- Review Form -->
-                    @if (showReviewForm()) {
+                    <!-- Comment Form -->
+                    @if (showCommentForm()) {
                     <div class="mb-6">
-                        <app-review-form (submitReview)="onSubmitReview($event)" (cancelForm)="onCancelReview()">
-                        </app-review-form>
+                        <app-profile-comment-form [isSubmitting]="isSubmittingComment()" [errorMessage]="commentError()"
+                            [resetForm]="resetCommentForm()" (submitComment)="onSubmitComment($event)"
+                            (cancelForm)="onCancelComment()">
+                        </app-profile-comment-form>
                     </div>
                     }
 
-                    <!-- Reviews List -->
-                    @if (isLoadingReviews()) {
+                    <!-- Comments List -->
+                    @if (isLoadingComments()) {
                     <div class="flex justify-center items-center py-12">
                         <mat-spinner diameter="40"></mat-spinner>
                     </div>
+                    } @else if (comments().length === 0) {
+                    <div class="text-center py-12">
+                        <mat-icon class="text-gray-300 text-6xl! w-16! h-16! mb-4">comment</mat-icon>
+                        <p class="text-gray-500 text-lg">Brak komentarzy</p>
+                        <p class="text-gray-400 text-sm mt-2">Zostaw pierwszy komentarz na tym profilu</p>
+                    </div>
                     } @else {
-                    <app-review-list [reviews]="reviews()"></app-review-list>
+                    <app-profile-comment-list [comments]="comments()">
+                    </app-profile-comment-list>
                     }
                 </div>
             </mat-card>

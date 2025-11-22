@@ -5,13 +5,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute } from '@angular/router';
-import { ReviewCreate, ReviewStats, UserReview } from '../../../models/review.model';
+import { ProfileComment } from '../../../models/review.model';
 import { AuthService } from '../../../services/auth.service';
 import { ReviewService } from '../../../services/review.service';
 import { UserService } from '../../../services/user.service';
 import { FeedHeaderComponent } from '../feed/feed-header/feed-header';
-import { ReviewFormComponent } from './review-form/review-form';
-import { ReviewListComponent } from './review-list/review-list';
+import { ProfileCommentFormComponent } from './profile-comment-form/profile-comment-form';
+import { ProfileCommentListComponent } from './profile-comment-list/profile-comment-list';
 
 @Component({
     selector: 'app-profile',
@@ -23,8 +23,8 @@ import { ReviewListComponent } from './review-list/review-list';
         MatCardModule,
         MatProgressSpinnerModule,
         FeedHeaderComponent,
-        ReviewFormComponent,
-        ReviewListComponent,
+        ProfileCommentFormComponent,
+        ProfileCommentListComponent,
     ],
     templateUrl: './profile.html',
     styleUrl: './profile.css',
@@ -37,11 +37,12 @@ export class ProfilePage {
 
     readonly currentUser = this.authService.currentUser;
     readonly isLoading = signal(false);
-    readonly reviews = signal<UserReview[]>([]);
-    readonly reviewStats = signal<ReviewStats | null>(null);
-    readonly showReviewForm = signal(false);
-    readonly isLoadingReviews = signal(false);
-    readonly hasUserReviewed = signal(false);
+    readonly comments = signal<ProfileComment[]>([]);
+    readonly showCommentForm = signal(false);
+    readonly isLoadingComments = signal(false);
+    readonly isSubmittingComment = signal(false);
+    readonly commentError = signal<string | null>(null);
+    readonly resetCommentForm = signal(false);
 
     readonly userInitials = computed(() => {
         const user = this.currentUser();
@@ -58,82 +59,75 @@ export class ProfilePage {
         return `${user.first_name} ${user.last_name}`.trim() || user.username || 'Użytkownik';
     });
 
-    readonly canLeaveReview = computed(() => {
-        const user = this.currentUser();
-        // Users can review their own profile in this implementation
-        // In production, you'd typically prevent self-reviews
-        return user && !this.hasUserReviewed();
-    });
-
     constructor() {
-        this.loadReviews();
+        this.loadComments();
     }
 
-    loadReviews(): void {
+    loadComments(): void {
         const user = this.currentUser();
         if (!user?.id) return;
 
-        this.isLoadingReviews.set(true);
+        this.isLoadingComments.set(true);
 
-        // Load reviews
-        this.reviewService.getUserReviews(user.id).subscribe({
-            next: (reviews) => {
-                this.reviews.set(reviews);
-                this.isLoadingReviews.set(false);
+        this.reviewService.getUserComments(user.id).subscribe({
+            next: (comments) => {
+                this.comments.set(comments);
+                this.isLoadingComments.set(false);
             },
             error: (error) => {
-                console.error('Failed to load reviews:', error);
-                this.isLoadingReviews.set(false);
-            },
-        });
-
-        // Load review stats
-        this.reviewService.getUserReviewStats(user.id).subscribe({
-            next: (stats) => {
-                this.reviewStats.set(stats);
-            },
-            error: (error) => {
-                console.error('Failed to load review stats:', error);
-            },
-        });
-
-        // Check if current user has already reviewed
-        this.reviewService.hasUserReviewed(user.id).subscribe({
-            next: (hasReviewed) => {
-                this.hasUserReviewed.set(hasReviewed);
+                console.error('Failed to load comments:', error);
+                this.isLoadingComments.set(false);
             },
         });
     }
 
-    toggleReviewForm(): void {
-        this.showReviewForm.update(show => !show);
+    toggleCommentForm(): void {
+        this.showCommentForm.update(show => !show);
     }
 
-    onSubmitReview(review: ReviewCreate): void {
+    onSubmitComment(content: string): void {
         const user = this.currentUser();
         if (!user?.id) return;
 
-        this.reviewService.createReview(user.id, review).subscribe({
-            next: () => {
-                this.showReviewForm.set(false);
-                this.loadReviews(); // Reload reviews after submission
+        this.isSubmittingComment.set(true);
+        this.commentError.set(null);
+
+        this.reviewService.createComment(user.id, content).subscribe({
+            next: (newComment) => {
+                this.isSubmittingComment.set(false);
+                this.commentError.set(null);
+
+                // Reset the form
+                this.resetCommentForm.set(true);
+                setTimeout(() => this.resetCommentForm.set(false), 0);
+
+                // Close form and add the new comment to the list immediately for better UX
+                this.showCommentForm.set(false);
+                this.comments.update(comments => [newComment, ...comments]);
             },
             error: (error) => {
-                console.error('Failed to submit review:', error);
+                console.error('Failed to submit comment:', error);
+                this.isSubmittingComment.set(false);
+
+                // Extract error message from API response
+                let errorMessage = 'Nie udało się dodać komentarza';
+                if (error.error?.detail) {
+                    if (typeof error.error.detail === 'string') {
+                        errorMessage = error.error.detail;
+                    } else if (Array.isArray(error.error.detail)) {
+                        errorMessage = error.error.detail.map((e: { msg: string }) => e.msg).join(', ');
+                    }
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+
+                this.commentError.set(errorMessage);
             },
         });
     }
 
-    onCancelReview(): void {
-        this.showReviewForm.set(false);
-    }
-
-    getStars(rating: number): boolean[] {
-        return Array(5).fill(false).map((_, i) => i < rating);
-    }
-
-    getRoundedRating(): number {
-        const stats = this.reviewStats();
-        return stats ? Math.round(stats.average_rating) : 0;
+    onCancelComment(): void {
+        this.showCommentForm.set(false);
+        this.commentError.set(null);
     }
 }

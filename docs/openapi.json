@@ -1842,6 +1842,290 @@
                 }
             }
         },
+        "/conversations/": {
+            "get": {
+                "tags": [
+                    "conversations"
+                ],
+                "summary": "Get Conversations",
+                "description": "Get all conversations the current user is part of.",
+                "operationId": "get_conversations_conversations__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/ConversationRead"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Get Conversations Conversations  Get"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "conversations"
+                ],
+                "summary": "Create Conversation Endpoint",
+                "description": "Create a new conversation with specified participants.",
+                "operationId": "create_conversation_endpoint_conversations__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConversationCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConversationRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            }
+        },
+        "/conversations/{conversation_id}": {
+            "get": {
+                "tags": [
+                    "conversations"
+                ],
+                "summary": "Get Conversation",
+                "description": "Get conversation details.",
+                "operationId": "get_conversation_conversations__conversation_id__get",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "conversation_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Conversation Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConversationRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/conversations/{conversation_id}/participants": {
+            "get": {
+                "tags": [
+                    "conversations"
+                ],
+                "summary": "Get Participants",
+                "description": "Get all participants in a conversation.",
+                "operationId": "get_participants_conversations__conversation_id__participants_get",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "conversation_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Conversation Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    },
+                                    "title": "Response Get Participants Conversations  Conversation Id  Participants Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/conversations/{conversation_id}/messages": {
+            "get": {
+                "tags": [
+                    "conversations"
+                ],
+                "summary": "Get Messages",
+                "description": "Get all messages in a conversation.",
+                "operationId": "get_messages_conversations__conversation_id__messages_get",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "conversation_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Conversation Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MessageRead"
+                                    },
+                                    "title": "Response Get Messages Conversations  Conversation Id  Messages Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "conversations"
+                ],
+                "summary": "Send Message",
+                "description": "Send a message to a conversation.",
+                "operationId": "send_message_conversations__conversation_id__messages_post",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "conversation_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Conversation Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MessageCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MessageRead"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/": {
             "get": {
                 "summary": "Read Root",
@@ -1979,6 +2263,56 @@
                 ],
                 "title": "CommentWithAuthor",
                 "description": "Response model for comment with author details."
+            },
+            "ConversationCreate": {
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "title": "Title"
+                    },
+                    "participant_ids": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "minItems": 1,
+                        "title": "Participant Ids"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "title",
+                    "participant_ids"
+                ],
+                "title": "ConversationCreate",
+                "description": "Conversation creation model."
+            },
+            "ConversationRead": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "title",
+                    "created_at"
+                ],
+                "title": "ConversationRead",
+                "description": "Conversation read model."
             },
             "Event": {
                 "properties": {
@@ -2323,6 +2657,60 @@
                 ],
                 "title": "LikesInfo",
                 "description": "Response model for post likes information."
+            },
+            "MessageCreate": {
+                "properties": {
+                    "content": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Content"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "content"
+                ],
+                "title": "MessageCreate",
+                "description": "Message creation model."
+            },
+            "MessageRead": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "content": {
+                        "type": "string",
+                        "title": "Content"
+                    },
+                    "sender_id": {
+                        "type": "integer",
+                        "title": "Sender Id"
+                    },
+                    "sender_name": {
+                        "type": "string",
+                        "title": "Sender Name"
+                    },
+                    "conversation_id": {
+                        "type": "integer",
+                        "title": "Conversation Id"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "title": "Created At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "content",
+                    "sender_id",
+                    "sender_name",
+                    "conversation_id",
+                    "created_at"
+                ],
+                "title": "MessageRead",
+                "description": "Message read model with sender information."
             },
             "Post": {
                 "properties": {

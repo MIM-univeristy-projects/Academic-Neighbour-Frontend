@@ -2,14 +2,16 @@
     class="mb-4 bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-[fadeInUp_0.4s_ease-out]">
     <!-- Header -->
     <div class="flex items-start gap-4 p-6 pb-4">
-        <div
-            class="w-14 h-14 rounded-full bg-linear-to-br from-amber-400 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+        <button (click)="onNavigateToProfile()"
+            class="w-14 h-14 rounded-full bg-linear-to-br from-amber-400 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-lg hover:scale-110 transition-transform cursor-pointer">
             {{ authorInitial() }}
-        </div>
+        </button>
         <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 truncate">
-                Użytkownik #{{ post().author_id }}
-            </h3>
+            <button (click)="onNavigateToProfile()" class="text-left hover:underline">
+                <h3 class="text-lg font-semibold text-gray-900 truncate">
+                    Użytkownik #{{ post().author_id }}
+                </h3>
+            </button>
             <p class="text-sm text-gray-500">
                 {{ formattedDate() }}
             </p>

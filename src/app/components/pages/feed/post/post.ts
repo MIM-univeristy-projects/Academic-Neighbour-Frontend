@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import { CommentRequest, CommentWithAuthor } from '../../../../models/comment.model';
 import { Post } from '../../../../models/post.model';
 import { CommentService } from '../../../../services/comment.service';
@@ -29,6 +30,7 @@ import { CommentListComponent } from './comment-list/comment-list';
 })
 export class PostComponent {
     private commentService = inject(CommentService);
+    private router = inject(Router);
 
     // Modern input() API
     post = input.required<Post>();
@@ -51,6 +53,13 @@ export class PostComponent {
         const postId = this.post().id;
         if (postId) {
             this.likePost.emit(postId);
+        }
+    }
+
+    onNavigateToProfile(): void {
+        const authorId = this.post().author_id;
+        if (authorId) {
+            this.router.navigate(['/profile', authorId]);
         }
     }
 

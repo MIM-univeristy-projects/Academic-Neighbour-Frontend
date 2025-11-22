@@ -1,14 +1,15 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FriendshipService } from '../../../../services/friendship.service';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserRead } from '../../../../models/auth.model';
+import { FriendshipService } from '../../../../services/friendship.service';
 
 // Importy Angular Material
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip'; // Dla podpowiedzi na przyciskach
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // Dla ładowania
+import { MatTooltipModule } from '@angular/material/tooltip'; // Dla podpowiedzi na przyciskach
 
 @Component({
   selector: 'app-friend-list',
@@ -26,6 +27,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; /
 })
 export class FriendList implements OnInit {
   private friendshipService = inject(FriendshipService);
+  private router = inject(Router);
 
   // Sygnały do zarządzania stanem
   readonly friends = signal<UserRead[]>([]);
@@ -82,5 +84,10 @@ export class FriendList implements OnInit {
     const firstInitial = user.first_name?.[0]?.toUpperCase() || '';
     const lastInitial = user.last_name?.[0]?.toUpperCase() || '';
     return firstInitial + lastInitial || user.username?.[0]?.toUpperCase() || 'U';
+  }
+
+  // Navigate to user profile
+  navigateToProfile(userId: number): void {
+    this.router.navigate(['/profile', userId]);
   }
 }

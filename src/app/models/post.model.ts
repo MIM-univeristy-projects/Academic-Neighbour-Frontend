@@ -2,6 +2,7 @@ export interface Post {
     id?: number | null;
     content: string;
     author_id: number;
+    group_id?: number | null;
     created_at?: string;
     likes_count?: number;
     comments_count?: number;
