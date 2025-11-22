@@ -26,7 +26,7 @@ export class GroupService {
                 }
 
                 const currentUserId = this.authService.currentUser()?.id;
-                
+
                 // Enrich each group with member count and membership status
                 const enrichedGroups$ = groups.map(group =>
                     this.getGroupMembers(group.id).pipe(

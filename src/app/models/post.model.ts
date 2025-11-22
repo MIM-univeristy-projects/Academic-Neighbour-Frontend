@@ -23,6 +23,7 @@ export interface PostWithAuthor {
     id: number;
     content: string;
     author_id: number;
+    group_id?: number | null;
     created_at: string;
     author_name: string;
 }

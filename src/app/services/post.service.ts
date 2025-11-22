@@ -87,21 +87,17 @@ export class PostService {
     }
 
     /**
-     * Create a new post
+     * Create a new post on the main wall (not in a group)
+     * The backend automatically sets author_id from authentication
+     * and sets group_id to null
      */
     createPost(postData: PostCreate): Observable<Post> {
-        const currentUser = this.authService.currentUser();
-
-        if (!currentUser?.id) {
+        if (!this.authService.isAuthenticated()) {
             return throwError(() => new Error('User must be authenticated to create a post'));
         }
 
-        const postPayload: Partial<Post> = {
-            content: postData.content,
-            author_id: currentUser.id
-        };
-
-        return this.http.post<Post>(`${this.apiUrl}/posts/`, postPayload).pipe(
+        // Only send content - backend handles author_id and group_id
+        return this.http.post<Post>(`${this.apiUrl}/posts/`, postData).pipe(
             tap(newPost => {
                 // Update cache with new post
                 this.postsCache.update(posts => [newPost, ...posts]);

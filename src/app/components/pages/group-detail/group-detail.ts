@@ -6,14 +6,14 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
+import { User } from '../../../models/auth.model';
 import { Group } from '../../../models/group.model';
 import { Post, PostCreate } from '../../../models/post.model';
-import { User } from '../../../models/auth.model';
 import { AuthService } from '../../../services/auth.service';
 import { GroupService } from '../../../services/group.service';
 import { PostService } from '../../../services/post.service';
-import { FeedHeaderComponent } from '../feed/feed-header/feed-header';
 import { CreatePostFormComponent } from '../feed/create-post-form/create-post-form';
+import { FeedHeaderComponent } from '../feed/feed-header/feed-header';
 import { PostComponent } from '../feed/post/post';
 
 @Component({

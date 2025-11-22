@@ -186,11 +186,9 @@
             } @else {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @for (group of groups(); track group.id; let index = $index) {
-                <div (click)="onNavigateToGroup(group.id)" 
-                     (keyup.enter)="onNavigateToGroup(group.id)"
-                     tabindex="0"
-                     role="button"
-                     class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-all cursor-pointer">
+                <div (click)="onNavigateToGroup(group.id)" (keyup.enter)="onNavigateToGroup(group.id)" tabindex="0"
+                    role="button"
+                    class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-all cursor-pointer">
                     <div class="flex items-start gap-4 mb-4">
                         <div
                             [class]="'w-14 h-14 rounded-xl flex items-center justify-center text-white text-lg font-bold shrink-0 ' + getGradientClass(index)">
@@ -211,7 +209,8 @@
                     <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                         <div class="flex items-center gap-2 text-gray-500 text-sm">
                             <mat-icon class="text-base! w-5! h-5!">people</mat-icon>
-                            <span>{{ group.member_count || 0 }} {{ group.member_count === 1 ? 'członek' : 'członków' }}</span>
+                            <span>{{ group.member_count || 0 }} {{ group.member_count === 1 ? 'członek' : 'członków'
+                                }}</span>
                         </div>
                         @if (group.is_member) {
                         <button mat-raised-button (click)="onLeaveGroup(group.id, $event)"
