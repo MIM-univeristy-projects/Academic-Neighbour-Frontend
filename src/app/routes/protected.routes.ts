@@ -13,6 +13,16 @@ export const protectedRoutes: Routes = [
         loadChildren: () => import('../components/pages/friends/friends.routes').then(m => m.friendsRoutes)
     },
     {
+        title: 'Wiadomości',
+        path: 'messages',
+        loadComponent: () => import('../components/pages/messages/messages').then(m => m.MessagesPage)
+    },
+    {
+        title: 'Profil',
+        path: 'profile/:id',
+        loadComponent: () => import('../components/pages/profile/profile').then(m => m.ProfilePage)
+    },
+    {
         path: '',
         redirectTo: 'feed',
         pathMatch: 'full'

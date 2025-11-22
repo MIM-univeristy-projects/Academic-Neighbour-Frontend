@@ -1,0 +1,61 @@
+<div class="review-form-container bg-white rounded-xl p-6 shadow-md">
+    <h3 class="text-xl font-bold text-gray-900 mb-4">Wystaw opinię</h3>
+
+    <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Rating Stars -->
+        <div class="rating-section">
+            <div class="block text-sm font-medium text-gray-700 mb-2">
+                Ocena <span class="text-red-500">*</span>
+            </div>
+            <div class="flex gap-2 items-center">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                <button type="button" (click)="setRating(star)" (mouseenter)="setHoveredRating(star)"
+                    (mouseleave)="clearHoveredRating()" class="p-0 transition-transform hover:scale-110">
+                    <mat-icon [class]="getStarClass(star)"
+                        class="text-4xl! w-10! h-10! cursor-pointer transition-colors">
+                        {{ getStarIcon(star) }}
+                    </mat-icon>
+                </button>
+                }
+                @if (selectedRating > 0) {
+                <span class="ml-2 text-gray-600 font-medium">{{ selectedRating }}/5</span>
+                }
+            </div>
+            @if (reviewForm.controls.rating.invalid && reviewForm.controls.rating.touched) {
+            <p class="text-red-500 text-sm mt-1">Wybierz ocenę od 1 do 5 gwiazdek</p>
+            }
+        </div>
+
+        <!-- Comment Field -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Twoja opinia</mat-label>
+            <textarea matInput formControlName="comment" placeholder="Podziel się swoją opinią o tym użytkowniku..."
+                rows="5" maxlength="500" class="resize-none">
+            </textarea>
+            <mat-hint align="end">{{ commentControl.value.length }} / 500</mat-hint>
+            @if (commentControl.invalid && commentControl.touched) {
+            <mat-error>
+                @if (commentControl.hasError('required')) {
+                Komentarz jest wymagany
+                }
+                @if (commentControl.hasError('minlength')) {
+                Komentarz musi mieć minimum 10 znaków
+                }
+            </mat-error>
+            }
+        </mat-form-field>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+            <button mat-button type="button" (click)="onCancel()" class="text-gray-600">
+                <mat-icon>close</mat-icon>
+                <span class="ml-1">Anuluj</span>
+            </button>
+            <button mat-raised-button type="submit" [disabled]="!isFormValid"
+                class="bg-linear-to-r from-amber-500 to-pink-500 text-white">
+                <mat-icon>rate_review</mat-icon>
+                <span class="ml-1">Wyślij opinię</span>
+            </button>
+        </div>
+    </form>
+</div>

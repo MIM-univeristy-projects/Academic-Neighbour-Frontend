@@ -3,6 +3,9 @@ export interface Post {
     content: string;
     author_id: number;
     created_at?: string;
+    likes_count?: number;
+    comments_count?: number;
+    liked_by_current_user?: boolean;
 }
 
 /**

@@ -39,6 +39,13 @@ export class FeedHeaderComponent {
         return `${user.first_name} ${user.last_name}`.trim() || user.username || 'Moje konto';
     });
 
+    navigateToProfile(): void {
+        const user = this.currentUser();
+        if (user?.id) {
+            this.router.navigate(['/profile', user.id]);
+        }
+    }
+
     logout(): void {
         this.authService.logout();
     }

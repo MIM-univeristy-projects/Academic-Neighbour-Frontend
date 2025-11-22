@@ -1,0 +1,156 @@
+<div class="min-h-screen bg-linear-to-b from-gray-50 to-gray-100">
+    <!-- Navigation Header -->
+    <app-feed-header></app-feed-header>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 pt-8 pb-8 sm:px-6 lg:px-8">
+        <!-- Page Title -->
+        <header class="mb-8 text-center sm:text-left animate-[fadeIn_0.6s_ease-out]">
+            <h1
+                class="text-5xl font-extrabold mb-3 bg-linear-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent">
+                Profil użytkownika
+            </h1>
+            <p class="text-lg text-gray-600 font-medium">
+                Twoje informacje i aktywność
+            </p>
+        </header>
+
+        <!-- Profile Content -->
+        <div class="space-y-6">
+            <!-- Profile Card -->
+            <mat-card class="shadow-lg! rounded-2xl!">
+                <div class="p-8">
+                    <div class="flex flex-col sm:flex-row items-center gap-6">
+                        <!-- Avatar -->
+                        <div
+                            class="w-32 h-32 rounded-full bg-linear-to-br from-amber-400 to-pink-500 flex items-center justify-center text-white text-4xl font-bold shadow-xl">
+                            {{ userInitials() }}
+                        </div>
+
+                        <!-- User Info -->
+                        <div class="flex-1 text-center sm:text-left">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-2">{{ userFullName() }}</h2>
+                            <p class="text-lg text-gray-600 mb-1">&#64;{{ currentUser()?.username }}</p>
+                            <p class="text-gray-500">{{ currentUser()?.email }}</p>
+                            <div class="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
+                                <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+                                    {{ currentUser()?.role === 'admin' ? 'Administrator' : 'Użytkownik' }}
+                                </span>
+                                @if (currentUser()?.is_active) {
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                                    Aktywny
+                                </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+
+            <!-- Account Details Card -->
+            <mat-card class="shadow-lg! rounded-2xl!">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <mat-icon class="text-amber-500">info</mat-icon>
+                        Szczegóły konta
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span class="text-gray-600">Imię:</span>
+                            <span class="font-medium text-gray-900">{{ currentUser()?.first_name }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span class="text-gray-600">Nazwisko:</span>
+                            <span class="font-medium text-gray-900">{{ currentUser()?.last_name }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span class="text-gray-600">Nazwa użytkownika:</span>
+                            <span class="font-medium text-gray-900">{{ currentUser()?.username }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span class="text-gray-600">Email:</span>
+                            <span class="font-medium text-gray-900">{{ currentUser()?.email }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <span class="text-gray-600">Data utworzenia:</span>
+                            <span class="font-medium text-gray-900">{{ currentUser()?.created_at | date:'medium'
+                                }}</span>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+
+            <!-- Reviews Section -->
+            <mat-card class="shadow-lg! rounded-2xl!">
+                <div class="p-6">
+                    <!-- Reviews Header with Stats -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                                <mat-icon class="text-amber-500">rate_review</mat-icon>
+                                Opinie
+                            </h3>
+                            @if (reviewStats()) {
+                            <div class="flex items-center gap-3 mt-2">
+                                <div class="flex items-center gap-1">
+                                    @for (filled of getStars(getRoundedRating()); track $index) {
+                                    <mat-icon [class]="filled ? 'text-amber-500' : 'text-gray-300'"
+                                        class="text-2xl! w-6! h-6!">
+                                        {{ filled ? 'star' : 'star_border' }}
+                                    </mat-icon>
+                                    }
+                                </div>
+                                <span class="text-xl font-semibold text-gray-900">
+                                    {{ reviewStats()!.average_rating.toFixed(1) }}
+                                </span>
+                                <span class="text-gray-500">
+                                    ({{ reviewStats()!.total_reviews }} {{ reviewStats()!.total_reviews === 1 ? 'opinia'
+                                    : 'opinii' }})
+                                </span>
+                            </div>
+                            }
+                        </div>
+
+                        @if (canLeaveReview()) {
+                        <button mat-raised-button (click)="toggleReviewForm()"
+                            class="bg-linear-to-r from-amber-500 to-pink-500 text-white">
+                            <mat-icon>{{ showReviewForm() ? 'close' : 'rate_review' }}</mat-icon>
+                            <span class="ml-1">{{ showReviewForm() ? 'Anuluj' : 'Wystaw opinię' }}</span>
+                        </button>
+                        }
+                    </div>
+
+                    <!-- Review Form -->
+                    @if (showReviewForm()) {
+                    <div class="mb-6">
+                        <app-review-form (submitReview)="onSubmitReview($event)" (cancelForm)="onCancelReview()">
+                        </app-review-form>
+                    </div>
+                    }
+
+                    <!-- Reviews List -->
+                    @if (isLoadingReviews()) {
+                    <div class="flex justify-center items-center py-12">
+                        <mat-spinner diameter="40"></mat-spinner>
+                    </div>
+                    } @else {
+                    <app-review-list [reviews]="reviews()"></app-review-list>
+                    }
+                </div>
+            </mat-card>
+
+            <!-- Activity Coming Soon Card -->
+            <mat-card class="shadow-lg! rounded-2xl!">
+                <div class="p-8 text-center">
+                    <div class="w-20 h-20 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-4">
+                        <mat-icon class="text-pink-500 text-5xl! w-12! h-12!">show_chart</mat-icon>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Aktywność - wkrótce!</h3>
+                    <p class="text-gray-600">
+                        Tutaj zobaczysz swoją aktywność, posty, komentarze i więcej.
+                    </p>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>

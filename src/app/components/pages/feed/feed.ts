@@ -4,10 +4,12 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { EventCreate } from '../../../models/event.model';
 import { PostCreate } from '../../../models/post.model';
 import { AuthService } from '../../../services/auth.service';
 import { EventService } from '../../../services/event.service';
 import { PostService } from '../../../services/post.service';
+import { CreateEventFormComponent } from './create-event-form/create-event-form';
 import { CreatePostFormComponent } from './create-post-form/create-post-form';
 import { FeedHeaderComponent } from './feed-header/feed-header';
 import { FeedTabsComponent } from './feed-tabs/feed-tabs';
@@ -16,7 +18,7 @@ import { PostComponent } from './post/post';
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, PostComponent, CreatePostFormComponent, FeedHeaderComponent, FeedTabsComponent],
+  imports: [CommonModule, MatIconModule, MatButtonModule, PostComponent, CreatePostFormComponent, CreateEventFormComponent, FeedHeaderComponent, FeedTabsComponent],
   templateUrl: './feed.html',
   styleUrl: './feed.css',
 })
@@ -81,6 +83,25 @@ export class Feed {
     });
   }
 
+  onCreateEvent(eventData: EventCreate): void {
+    // Check authentication before creating event
+    if (!this.authService.isAuthenticated()) {
+      this.redirectToLogin('Musisz być zalogowany, aby utworzyć event.');
+      return;
+    }
+
+    this.eventService.createEvent(eventData).subscribe({
+      next: () => {
+        // Service automatically updates the cache
+        this.errorMessage.set(null);
+      },
+      error: (error) => {
+        console.error('Error creating event:', error);
+        this.handleError(error, 'Nie udało się utworzyć eventu.');
+      },
+    });
+  }
+
   onLikePost(postId: number): void {
     // Check authentication before liking
     if (!this.authService.isAuthenticated()) {
@@ -88,27 +109,42 @@ export class Feed {
       return;
     }
 
-    this.postService.likePost(postId).subscribe({
-      next: () => {
-        // Service automatically updates the cache
-        this.errorMessage.set(null);
-      },
-      error: (error) => {
-        console.error('Error liking post:', error);
-        this.handleError(error, 'Nie udało się polubić posta.');
-      },
-    });
+    // Find the post to check its current like status
+    const post = this.posts().find(p => p.id === postId);
+    if (!post) return;
+
+    const isLiked = post.liked_by_current_user;
+
+    if (isLiked) {
+      // Unlike the post
+      this.postService.unlikePost(postId).subscribe({
+        next: () => {
+          this.loadPosts(); // Reload to get updated data
+          this.errorMessage.set(null);
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Error unliking post:', error);
+          this.handleError(error, 'Nie udało się usunąć polubienia posta.');
+        },
+      });
+    } else {
+      // Like the post
+      this.postService.likePost(postId).subscribe({
+        next: () => {
+          this.loadPosts(); // Reload to get updated data
+          this.errorMessage.set(null);
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Error liking post:', error);
+          this.handleError(error, 'Nie udało się polubić posta.');
+        },
+      });
+    }
   }
 
-  onCommentPost(postId: number): void {
-    // Check authentication before commenting
-    if (!this.authService.isAuthenticated()) {
-      this.redirectToLogin('Musisz być zalogowany, aby skomentować post.');
-      return;
-    }
-
-    // TODO: Implement comment functionality
-    console.log('Comment on post:', postId);
+  onRefreshPost(): void {
+    // Reload posts to get updated counts
+    this.loadPosts();
   }
 
   loadEvents(): void {

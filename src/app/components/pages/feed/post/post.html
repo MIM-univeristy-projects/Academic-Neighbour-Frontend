@@ -25,15 +25,63 @@
 
     <!-- Actions -->
     <div class="flex items-center gap-2 px-4 py-3 border-t border-gray-100">
-        <button mat-button (click)="onLike()" matTooltip="Polub ten post"
-            class="hover:bg-amber-50 hover:text-amber-600">
-            <mat-icon>thumb_up</mat-icon>
-            <span class="ml-2">Lubię to</span>
+        <button mat-button (click)="onLike()"
+            [matTooltip]="post().liked_by_current_user ? 'Usuń polubienie' : 'Polub ten post'"
+            [class.text-amber-600]="post().liked_by_current_user" [class.bg-amber-50]="post().liked_by_current_user"
+            class="hover:bg-amber-50 hover:text-amber-600 transition-colors">
+            <mat-icon [class.filled]="post().liked_by_current_user">
+                {{ post().liked_by_current_user ? 'thumb_up' : 'thumb_up_off_alt' }}
+            </mat-icon>
+            <span class="ml-2">
+                {{ post().liked_by_current_user ? 'Lubisz to' : 'Lubię to' }}
+                @if (post().likes_count) {
+                <span class="font-semibold">({{ post().likes_count }})</span>
+                }
+            </span>
         </button>
-        <button mat-button (click)="onComment()" matTooltip="Skomentuj ten post"
-            class="hover:bg-pink-50 hover:text-pink-600">
-            <mat-icon>comment</mat-icon>
-            <span class="ml-2">Komentarz</span>
+        <button mat-button (click)="onToggleComments()" matTooltip="Pokaż/ukryj komentarze"
+            [class.text-pink-600]="showComments()" [class.bg-pink-50]="showComments()"
+            class="hover:bg-pink-50 hover:text-pink-600 transition-colors">
+            <mat-icon>{{ showComments() ? 'expand_less' : 'comment' }}</mat-icon>
+            <span class="ml-2">
+                {{ showComments() ? 'Ukryj' : 'Komentarz' }}
+                @if (post().comments_count) {
+                <span class="font-semibold">({{ post().comments_count }})</span>
+                }
+            </span>
         </button>
     </div>
+
+    <!-- Comments Section -->
+    @if (showComments()) {
+    <div class="border-t border-gray-100 p-4 bg-gray-50">
+        <!-- Error Message -->
+        @if (commentError()) {
+        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <mat-icon class="text-red-500 align-middle mr-1">error</mat-icon>
+            {{ commentError() }}
+        </div>
+        }
+
+        <!-- Comment Form -->
+        <div class="mb-4">
+            <app-comment-form [postId]="post().id!" (submitComment)="onCreateComment($event)">
+            </app-comment-form>
+        </div>
+
+        <!-- Loading State -->
+        @if (isLoadingComments()) {
+        <div class="flex justify-center items-center py-8">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+        }
+
+        <!-- Comments List -->
+        @if (!isLoadingComments()) {
+        <app-comment-list [comments]="comments()" [postId]="post().id!" (deleteComment)="onDeleteComment($event)"
+            (updateComment)="onUpdateComment($event)">
+        </app-comment-list>
+        }
+    </div>
+    }
 </div>

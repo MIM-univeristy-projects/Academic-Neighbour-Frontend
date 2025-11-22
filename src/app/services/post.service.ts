@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, catchError, tap, throwError } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LikesInfo, PostLike } from '../models/like.model';
 import { Post, PostCreate, PostWithAuthor } from '../models/post.model';
 import { AuthService } from './auth.service';
+import { CommentService } from './comment.service';
 
 @Injectable({
     providedIn: 'root',
@@ -12,6 +13,7 @@ import { AuthService } from './auth.service';
 export class PostService {
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    private commentService = inject(CommentService);
 
     private readonly apiUrl = environment.apiUrl;
 
@@ -24,15 +26,61 @@ export class PostService {
     readonly cachedPosts = this.postsCache.asReadonly();
 
     /**
-     * Get all posts
+     * Get all posts with likes and comments information
      */
     getPosts(): Observable<Post[]> {
         return this.http.get<Post[]>(`${this.apiUrl}/posts/`).pipe(
-            tap(posts => this.postsCache.set(posts)),
+            switchMap(posts => {
+                if (posts.length === 0) {
+                    this.postsCache.set(posts);
+                    return of(posts);
+                }
+
+                // Fetch likes info and comments count for each post
+                const enrichedPosts$ = posts.map(post =>
+                    this.enrichPostWithMetadata(post)
+                );
+
+                return forkJoin(enrichedPosts$).pipe(
+                    tap(enrichedPosts => this.postsCache.set(enrichedPosts))
+                );
+            }),
             catchError(error => {
                 console.error('Failed to fetch posts:', error);
                 return throwError(() => error);
             })
+        );
+    }
+
+    /**
+     * Enrich a single post with likes and comments metadata
+     */
+    private enrichPostWithMetadata(post: Post): Observable<Post> {
+        if (!post.id) {
+            return of(post);
+        }
+
+        const likesInfo$ = this.authService.isAuthenticated()
+            ? this.getLikesInfo(post.id).pipe(
+                catchError(() => of({ likes_count: 0, liked_by_current_user: false }))
+            )
+            : of({ likes_count: 0, liked_by_current_user: false });
+
+        const comments$ = this.commentService.getPostComments(post.id).pipe(
+            map(comments => comments.length),
+            catchError(() => of(0))
+        );
+
+        return forkJoin({
+            likes: likesInfo$,
+            commentsCount: comments$
+        }).pipe(
+            map(({ likes, commentsCount }) => ({
+                ...post,
+                likes_count: likes.likes_count,
+                liked_by_current_user: likes.liked_by_current_user,
+                comments_count: commentsCount
+            }))
         );
     }
 

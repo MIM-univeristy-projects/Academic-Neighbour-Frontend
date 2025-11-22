@@ -16,13 +16,15 @@
                 <mat-icon class="mr-2">home</mat-icon>
                 Tablica
             </button>
-            <button mat-button class="text-gray-700 hover:bg-amber-50">
+            <button mat-button [routerLink]="['/friends']" routerLinkActive="active-link"
+                class="text-gray-700 hover:bg-amber-50">
                 <mat-icon class="mr-2">people</mat-icon>
-                Społeczność
+                Znajomi
             </button>
-            <button mat-button class="text-gray-700 hover:bg-amber-50">
-                <mat-icon class="mr-2">notifications</mat-icon>
-                Powiadomienia
+            <button mat-button [routerLink]="['/messages']" routerLinkActive="active-link"
+                class="text-gray-700 hover:bg-amber-50">
+                <mat-icon class="mr-2">message</mat-icon>
+                Wiadomości
             </button>
         </nav>
 
@@ -37,25 +39,21 @@
                 <mat-icon class="hidden sm:inline">arrow_drop_down</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
-                <button mat-menu-item>
+                <button mat-menu-item (click)="navigateToProfile()">
                     <mat-icon>person</mat-icon>
                     <span>Profil</span>
-                </button>
-                <button mat-menu-item>
-                    <mat-icon>settings</mat-icon>
-                    <span>Ustawienia</span>
                 </button>
                 <button mat-menu-item class="md:hidden" [routerLink]="['/feed']">
                     <mat-icon>home</mat-icon>
                     <span>Tablica</span>
                 </button>
-                <button mat-menu-item class="md:hidden">
+                <button mat-menu-item class="md:hidden" [routerLink]="['/friends']">
                     <mat-icon>people</mat-icon>
-                    <span>Społeczność</span>
+                    <span>Znajomi</span>
                 </button>
-                <button mat-menu-item class="md:hidden">
-                    <mat-icon>notifications</mat-icon>
-                    <span>Powiadomienia</span>
+                <button mat-menu-item class="md:hidden" [routerLink]="['/messages']">
+                    <mat-icon>message</mat-icon>
+                    <span>Wiadomości</span>
                 </button>
                 <mat-divider></mat-divider>
                 <button mat-menu-item (click)="logout()">
