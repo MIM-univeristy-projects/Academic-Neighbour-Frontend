@@ -1,7 +1,7 @@
 <div class="create-event-card bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 mb-6">
     <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
         <mat-card class="shadow-none! rounded-2xl!">
-            <!-- Collapsed State -->
+
             @if (!isExpanded()) {
             <div class="flex items-center gap-4 p-4 cursor-pointer hover:bg-gray-50 rounded-2xl transition-colors"
                 role="button" tabindex="0" (click)="onFocus()" (keyup.enter)="onFocus()" (keyup.space)="onFocus()">
@@ -13,7 +13,7 @@
             </div>
             }
 
-            <!-- Expanded State -->
+
             @if (isExpanded()) {
             <div class="p-6 space-y-4">
                 <div class="flex items-center gap-3 mb-4">
@@ -24,7 +24,7 @@
                     <h2 class="text-2xl font-bold text-gray-800">Utwórz nowy event</h2>
                 </div>
 
-                <!-- Title -->
+
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Tytuł eventu</mat-label>
                     <input matInput formControlName="title" placeholder="Wprowadź tytuł eventu..." maxlength="200">
@@ -41,7 +41,7 @@
                     }
                 </mat-form-field>
 
-                <!-- Description -->
+
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Opis</mat-label>
                     <textarea matInput formControlName="description" placeholder="Opisz szczegóły eventu..." rows="4"
@@ -59,7 +59,7 @@
                     }
                 </mat-form-field>
 
-                <!-- Location -->
+
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Lokalizacja</mat-label>
                     <input matInput formControlName="location" placeholder="Gdzie odbędzie się event?" maxlength="300">
@@ -77,9 +77,9 @@
                     }
                 </mat-form-field>
 
-                <!-- Date Range -->
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Start Date -->
+
                     <mat-form-field appearance="outline" class="w-full">
                         <mat-label>Data rozpoczęcia</mat-label>
                         <input matInput [matDatepicker]="startPicker" formControlName="start_date" [min]="minDate"
@@ -93,7 +93,7 @@
                         }
                     </mat-form-field>
 
-                    <!-- End Date -->
+
                     <mat-form-field appearance="outline" class="w-full">
                         <mat-label>Data zakończenia</mat-label>
                         <input matInput [matDatepicker]="endPicker" formControlName="end_date" [min]="minDate"
@@ -108,7 +108,7 @@
                     </mat-form-field>
                 </div>
 
-                <!-- Action Buttons -->
+
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <button mat-button type="button" (click)="onCancel()" class="text-gray-600">
                         <mat-icon>close</mat-icon>

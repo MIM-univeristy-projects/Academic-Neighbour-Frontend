@@ -1,10 +1,10 @@
 <div class="min-h-screen bg-linear-to-b from-gray-50 to-gray-100">
-    <!-- Navigation Header -->
+
     <app-feed-header></app-feed-header>
 
-    <!-- Main Content -->
+
     <div class="max-w-7xl mx-auto px-4 pt-8 pb-8 sm:px-6 lg:px-8">
-        <!-- Page Header -->
+
         <header class="mb-8 flex items-center justify-between animate-[fadeIn_0.6s_ease-out]">
             <div>
                 <h1
@@ -22,14 +22,14 @@
             </button>
         </header>
 
-        <!-- Loading State -->
+
         @if (isLoading()) {
         <div class="flex justify-center items-center py-20">
             <mat-spinner diameter="50"></mat-spinner>
         </div>
         }
 
-        <!-- Empty State -->
+
         @else if (groups().length === 0) {
         <mat-card class="shadow-lg! rounded-2xl! text-center py-16">
             <div class="w-24 h-24 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-6">
@@ -47,14 +47,14 @@
         </mat-card>
         }
 
-        <!-- Groups Grid -->
+
         @else {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @for (group of groups(); track group.id; let index = $index) {
             <mat-card class="shadow-lg! rounded-2xl! hover:shadow-xl! transition-all duration-300 cursor-pointer"
                 (click)="navigateToGroup(group.id)">
                 <div class="p-6">
-                    <!-- Group Icon -->
+
                     <div class="flex items-start gap-4 mb-4">
                         <div
                             [class]="'w-16 h-16 rounded-xl flex items-center justify-center text-white text-xl font-bold shrink-0 ' + getGradientClass(index)">
@@ -70,12 +70,12 @@
                         </div>
                     </div>
 
-                    <!-- Group Description -->
+
                     <p class="text-gray-700 mb-4 line-clamp-3">
                         {{ group.description }}
                     </p>
 
-                    <!-- Actions -->
+
                     <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                         <div class="flex items-center gap-2 text-gray-500 text-sm">
                             <mat-icon class="text-xl! w-5! h-5!">people</mat-icon>

@@ -1,5 +1,5 @@
 <div class="friend-search-container">
-    <!-- Search Input -->
+
     <mat-form-field appearance="outline" class="w-full mb-4">
         <mat-label>Szukaj użytkowników</mat-label>
         <input matInput type="text" [formControl]="searchControl"
@@ -15,7 +15,7 @@
         }
     </mat-form-field>
 
-    <!-- Search Results -->
+
     @if (isSearching()) {
     <div class="flex justify-center items-center p-8">
         <mat-spinner diameter="40"></mat-spinner>
@@ -45,13 +45,13 @@
 
         @for (user of searchResults(); track user.id; let index = $index) {
         <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <!-- Avatar -->
+
             <button (click)="navigateToProfile(user.id)"
                 [class]="'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0 hover:scale-110 transition-transform cursor-pointer ' + getGradientClass(index)">
                 {{ getInitials(user) }}
             </button>
 
-            <!-- User Info -->
+
             <div class="flex-1 min-w-0">
                 <button (click)="navigateToProfile(user.id)" class="text-left hover:underline">
                     <p class="font-semibold text-gray-900">
@@ -64,7 +64,7 @@
                 }
             </div>
 
-            <!-- Action Button -->
+
             <div class="shrink-0">
                 @if (isSendingRequest(user.id)) {
                 <button mat-raised-button disabled class="bg-gray-300">

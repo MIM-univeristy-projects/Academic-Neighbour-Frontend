@@ -1,13 +1,13 @@
 <div class="min-h-screen bg-linear-to-b from-gray-50 to-gray-100">
-    <!-- Navigation Header -->
+
     <app-feed-header></app-feed-header>
 
-    <!-- Feed Tabs -->
+
     <app-feed-tabs [activeTab]="activeTab()" (tabChanged)="onTabChange($event)"></app-feed-tabs>
 
-    <!-- Main Content -->
+
     <div class="max-w-4xl mx-auto px-4 pt-8 pb-8 sm:px-6 lg:px-8">
-        <!-- Page Title -->
+
         <header class="mb-8 text-center sm:text-left animate-[fadeIn_0.6s_ease-out]">
             <h1
                 class="text-5xl font-extrabold mb-3 bg-linear-to-r from-amber-500 to-pink-500 bg-clip-text text-transparent">
@@ -26,9 +26,9 @@
             </p>
         </header>
 
-        <!-- Content -->
+
         <div class="space-y-4">
-            <!-- Board Tab Content -->
+
             @if (activeTab() === 'board') {
             <app-create-post-form (createPost)="onCreatePost($event)"></app-create-post-form>
 
@@ -76,7 +76,7 @@
             }
             }
 
-            <!-- Events Tab Content -->
+
             @if (activeTab() === 'events') {
             <app-create-event-form (createEvent)="onCreateEvent($event)"></app-create-event-form>
 
@@ -148,7 +148,7 @@
             }
             }
 
-            <!-- Groups Tab Content -->
+
             @if (activeTab() === 'groups') {
 
             @if (hasError()) {
